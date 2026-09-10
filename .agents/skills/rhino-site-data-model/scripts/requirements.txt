@@ -1,0 +1,4 @@
+overturemaps>=1.0,<2
+pyproj>=3.7,<4
+rhino3dm>=8.17,<9
+shapely>=2.1,<3

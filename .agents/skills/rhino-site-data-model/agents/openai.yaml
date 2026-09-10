@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rhino Site Data Model"
+  short_description: "Build validated geospatial site models in Rhino"
+  default_prompt: "Use $rhino-site-data-model to build a structured Rhino site data model for this user-defined site."
