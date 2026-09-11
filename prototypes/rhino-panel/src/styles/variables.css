@@ -1,0 +1,24 @@
+:root {
+  --primary-color: #333c55;
+  --off-white: #f7f7f7;
+  --secondary-color: #d1d6e3;
+  --dark-grey: #535353;
+  --accent-color: #58629e;
+  --page-background-color: #eef0f5;
+  --header-border-color: #dce0e9;
+  --navigation-border-color: #d4d9e4;
+  --brand-divider-color: #b5bbca;
+  --muted-text-color: #727889;
+  --focus-outline-color: #a8b6ff;
+  --success-color: #39745a;
+  --success-surface: #edf7f1;
+  --warning-color: #8a5c13;
+  --warning-surface: #fff7e6;
+  --error-color: #8c3030;
+  --error-surface: #fff1f1;
+  --app-font-family: Avenir, Helvetica, Arial, sans-serif;
+  --primary-radius: 13px;
+  --secondary-radius: 7px;
+  --panel-shadow: 0 8px 28px #333c5510, 0 1px 3px #333c5514;
+}
+
