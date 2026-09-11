@@ -1,0 +1,9 @@
+{
+  "status": "exported",
+  "sheets": [
+    "poplar-context-plan",
+    "poplar-site-plan"
+  ],
+  "visual_review": "Inspect the PNG files before delivery",
+  "illustrator_check": "Open-and-edit check not performed by this command"
+}

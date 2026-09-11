@@ -1,0 +1,50 @@
+{
+  "sheets": [
+    {
+      "name": "poplar-context-plan",
+      "title": "Poplar Recreation Ground",
+      "subtitle": "Surrounding context / London / Source plan from the Rhino model",
+      "sheet_id": "P01",
+      "drawing_name": "CONTEXT PLAN",
+      "scale": 3000,
+      "bounds_m": [-350, -350, 350, 350],
+      "north": "+Y",
+      "north_label": "MODEL NORTH  /  +Y",
+      "scale_bar_m": 200,
+      "date": "10 SEPTEMBER 2026",
+      "notes": [
+        "Overture Maps / 2026-08-19.0",
+        "Includes OpenStreetMap source data.",
+        "See object metadata for source licences.",
+        "Existing 2D source layers at Z = 0.",
+        "Roads and paths are centre lines.",
+        "Boundary follows the mapped park.",
+        "No floor or roof detail is inferred.",
+        "Tree symbols mark source points."
+      ]
+    },
+    {
+      "name": "poplar-site-plan",
+      "title": "Poplar Recreation Ground",
+      "subtitle": "Site and immediate context / London / Source plan from the Rhino model",
+      "sheet_id": "P02",
+      "drawing_name": "SITE PLAN",
+      "scale": 1250,
+      "bounds_m": [-135, -95, 160, 195],
+      "north": "+Y",
+      "north_label": "MODEL NORTH  /  +Y",
+      "scale_bar_m": 80,
+      "date": "10 SEPTEMBER 2026",
+      "notes": [
+        "Overture Maps / 2026-08-19.0",
+        "Includes OpenStreetMap source data.",
+        "See object metadata for source licences.",
+        "Existing 2D source layers at Z = 0.",
+        "Roads and paths are centre lines.",
+        "Boundary follows the mapped park.",
+        "No floor or roof detail is inferred.",
+        "Tree symbols mark source points."
+      ]
+    }
+  ]
+}

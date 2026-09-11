@@ -1,0 +1,12 @@
+{
+  "ai_file": "C:\\Users\\AshwinAbraham\\source\\repos\\AIQ Studio\\artifacts\\poplar-plans-v2\\poplar-context-plan.ai",
+  "bytes": 459386,
+  "writer": "Rhino.FileIO.FileAi",
+  "rhino_version": "8.32.26160.13001",
+  "paper_units": "mm",
+  "export_scale": "1:1",
+  "drawing_scale": 3000.0,
+  "rhino_objects": 1663,
+  "rhino_layers": 94,
+  "illustrator_open_check": "Not run: Adobe Illustrator is not installed"
+}

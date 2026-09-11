@@ -1,0 +1,41 @@
+{
+  "bounding_box_points": [
+    -1.0,
+    -1.0,
+    1191.0,
+    842.0
+  ],
+  "operators": [
+    "*U",
+    "*u",
+    "A",
+    "D",
+    "L",
+    "LB",
+    "Lb",
+    "Ln",
+    "R",
+    "S",
+    "TO",
+    "TP",
+    "Tf",
+    "To",
+    "Tp",
+    "Tr",
+    "Tx",
+    "U",
+    "XA",
+    "Xa",
+    "d",
+    "f",
+    "m",
+    "s",
+    "u",
+    "w"
+  ],
+  "ai_sha256": "4608f90a6964e13bed0618205cfc733bebb1aebf138bae0849d1e1e22bdb19d9",
+  "png": "C:\\Users\\AshwinAbraham\\source\\repos\\AIQ Studio\\artifacts\\poplar-plans-v4\\poplar-context-plan.png",
+  "dpi": 150,
+  "renderer": "Ghostscript with the workflow's restricted Rhino AI3 preview procset",
+  "note": "PNG reads exported AI paths and text; Illustrator itself was not checked"
+}

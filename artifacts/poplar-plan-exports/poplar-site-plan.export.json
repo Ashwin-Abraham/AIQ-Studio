@@ -1,0 +1,19 @@
+{
+  "ai_file": "C:\\Users\\AshwinAbraham\\source\\repos\\AIQ Studio\\artifacts\\poplar-plan-exports\\poplar-site-plan.ai",
+  "bytes": 809608,
+  "writer": "Rhino native AI export",
+  "rhino_version": "8.32.26160.13001",
+  "paper_units": "mm",
+  "export_scale": "1:1",
+  "drawing_scale": 1250.0,
+  "rhino_objects": 1012,
+  "rhino_layers": 67,
+  "text": "Outlined vector lettering; source wording remains in scene JSON and SVG",
+  "bounding_box_points": [
+    -1.0,
+    -1.0,
+    1191.0,
+    842.0
+  ],
+  "illustrator_open_check": "Not run: Adobe Illustrator is not installed"
+}

@@ -1,0 +1,19 @@
+{
+  "ai_file": "C:\\Users\\AshwinAbraham\\source\\repos\\AIQ Studio\\artifacts\\poplar-plan-exports\\poplar-context-plan.ai",
+  "bytes": 1168058,
+  "writer": "Rhino native AI export",
+  "rhino_version": "8.32.26160.13001",
+  "paper_units": "mm",
+  "export_scale": "1:1",
+  "drawing_scale": 3000.0,
+  "rhino_objects": 2265,
+  "rhino_layers": 95,
+  "text": "Outlined vector lettering; source wording remains in scene JSON and SVG",
+  "bounding_box_points": [
+    -1.0,
+    -1.0,
+    1191.0,
+    842.0
+  ],
+  "illustrator_open_check": "Not run: Adobe Illustrator is not installed"
+}
