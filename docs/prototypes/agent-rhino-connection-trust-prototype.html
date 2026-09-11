@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIQ Studio connection and trust prototype</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #263047;
+      --muted: #657087;
+      --line: #d1d6e3;
+      --surface: #ffffff;
+      --canvas: #eef0f5;
+      --accent: #58629e;
+      --accent-soft: #e7e9f4;
+      --success: #247352;
+      --success-soft: #e1f2ea;
+      --warning: #9a5a10;
+      --warning-soft: #fff0d9;
+      --danger: #9a3540;
+      --danger-soft: #f9e4e7;
+      font-family: Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 64px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--danger);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 860px;
+      margin-bottom: 12px;
+      font-size: clamp(2rem, 5vw, 3.7rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .lede {
+      max-width: 850px;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.6;
+    }
+
+    .question {
+      padding: 20px 22px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      background: var(--surface);
+      box-shadow: 0 6px 22px rgb(38 48 71 / 8%);
+    }
+
+    .question strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 20px;
+      margin-top: 20px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 20px;
+    }
+
+    .panel {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 7px 24px rgb(38 48 71 / 6%);
+    }
+
+    .summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .pill.success {
+      color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .pill.warning {
+      color: var(--warning);
+      background: var(--warning-soft);
+    }
+
+    .pill.danger {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .session-tabs,
+    .scenario-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab,
+    .session-tab,
+    .button {
+      min-height: 40px;
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--ink);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .tab:hover,
+    .session-tab:hover,
+    .button:hover {
+      border-color: var(--accent);
+    }
+
+    .tab.active,
+    .session-tab.active,
+    .button.primary {
+      border-color: var(--accent);
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .button.danger {
+      color: var(--danger);
+      border-color: #e3aeb5;
+      background: var(--danger-soft);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .notice {
+      margin: 0 0 16px;
+      padding: 13px 15px;
+      border-radius: 10px;
+      color: var(--muted);
+      background: #f6f7fa;
+      line-height: 1.45;
+    }
+
+    .notice strong {
+      color: var(--ink);
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      min-height: 72px;
+      padding: 11px 12px;
+      border: 1px solid #e1e4ec;
+      border-radius: 9px;
+      background: #fafbfc;
+    }
+
+    .field.wide {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 750;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .field-value {
+      overflow-wrap: anywhere;
+      font-size: 0.93rem;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .subsection {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .action-grid .button {
+      text-align: left;
+    }
+
+    .action-grid small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .button.primary small {
+      color: rgb(255 255 255 / 82%);
+    }
+
+    .scenario-description {
+      min-height: 70px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .walkthrough-steps {
+      display: grid;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .walkthrough-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--ink);
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .walkthrough-step.current {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      cursor: pointer;
+    }
+
+    .walkthrough-step.done {
+      border-color: #b8d8ca;
+      color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .step-number {
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--muted);
+      background: #e9ebf0;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .current .step-number {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .done .step-number {
+      color: #ffffff;
+      background: var(--success);
+    }
+
+    .journal-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th,
+    td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #e3e6ed;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .empty {
+      padding: 20px;
+      border: 1px dashed var(--line);
+      border-radius: 9px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .rules {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .rules li {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 9px;
+      align-items: start;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .rules b {
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 0.75rem;
+    }
+
+    code {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: #e9ebf0;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 0.86em;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        width: min(100% - 20px, 1240px);
+        padding-top: 20px;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .fields,
+      .action-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.wide {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">Throwaway logic prototype — not production software</p>
+    <h1>Can an agent use Rhino without taking control from Rhino?</h1>
+    <p class="lede">
+      Press the controls to test a proposed AIQ Studio connection. The agent uses
+      <code>aiq.exe</code>. Each command uses a private named pipe and short-lived access.
+      Rhino checks every request before it reads or changes a document.
+    </p>
+
+    <section class="question" aria-labelledby="design-question">
+      <strong id="design-question">Design question</strong>
+      Can a command adapter and a private, per-session named pipe give Codex and OpenCode
+      safe, resumable Rhino access while Rhino remains the only authority for document changes?
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="panel" aria-labelledby="state-title">
+          <h2 id="state-title">Current connection state</h2>
+          <div id="summary" class="summary-bar"></div>
+          <div id="session-tabs" class="session-tabs" aria-label="AIQ Sessions"></div>
+          <div id="last-result" class="notice" aria-live="polite"></div>
+          <div id="session-state"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="journal-title">
+          <h2 id="journal-title">Session journal</h2>
+          <p class="notice">
+            Rhino records each request and result. Select a session above to see its journal.
+          </p>
+          <div id="journal" class="journal-wrap"></div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="panel" aria-labelledby="walkthrough-title">
+          <h2 id="walkthrough-title">Guided cases</h2>
+          <div id="scenario-tabs" class="scenario-tabs" aria-label="Guided cases"></div>
+          <div id="scenario"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="free-play-title">
+          <h2 id="free-play-title">Free play</h2>
+          <p class="notice">
+            Try any action in any order. An invalid action must fail without changing the document.
+          </p>
+          <div class="action-grid">
+            <button class="button" data-action="INSPECT">
+              Inspect document
+              <small>Run an allowlisted read-only request.</small>
+            </button>
+            <button class="button primary" data-action="PREPARE_CHANGE">
+              Prepare layer change
+              <small>Create a preview and request approval.</small>
+            </button>
+            <button class="button" data-action="APPROVE">
+              Approve prepared request
+              <small>Approval applies to one request only.</small>
+            </button>
+            <button class="button" data-action="REJECT">
+              Reject prepared request
+              <small>Reject the current request without a change.</small>
+            </button>
+            <button class="button" data-action="EXTERNAL_EDIT">
+              Simulate manual Rhino edit
+              <small>Change the document revision outside AIQ Studio.</small>
+            </button>
+            <button class="button" data-action="ADVANCE_TIME">
+              Advance time by 6 minutes
+              <small>Expire the short-lived access token.</small>
+            </button>
+            <button class="button danger" data-action="INVALIDATE_TOKEN">
+              Invalidate access
+              <small>Simulate an invalid or revoked token.</small>
+            </button>
+            <button class="button" data-action="INTERRUPT">
+              Interrupt session
+              <small>Close the connection and cancel pending approval.</small>
+            </button>
+            <button class="button" data-action="RESUME">
+              Resume with new access
+              <small>Issue a new token. Do not restore approval.</small>
+            </button>
+            <button class="button danger" data-action="TRY_UNLISTED">
+              Try unlisted command
+              <small>Attempt arbitrary script execution.</small>
+            </button>
+            <button class="button" data-action="RESET_SINGLE">
+              Reset one session
+              <small>Return to the initial state.</small>
+            </button>
+            <button class="button" data-action="RESET_TWO">
+              Reset two sessions
+              <small>Give each session its own pipe and access.</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="rules-title">
+          <h2 id="rules-title">Trust rules under test</h2>
+          <ol class="rules">
+            <li><b>1</b><span>Only typed operations on Rhino's allowlist can run.</span></li>
+            <li><b>2</b><span>Each request names its session, document, revision, and access token.</span></li>
+            <li><b>3</b><span>A material change needs approval for that request only.</span></li>
+            <li><b>4</b><span>A new document revision makes an old request stale.</span></li>
+            <li><b>5</b><span>Resume gives new access and does not restore an old approval.</span></li>
+            <li><b>6</b><span>Each session has a private pipe and a separate journal.</span></li>
+          </ol>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    /*
+     * Portable prototype logic.
+     * This module does not use the DOM. The page below calls its public interface.
+     */
+    const ConnectionModel = (() => {
+      const TOKEN_LIFETIME_MINUTES = 5
+
+      const operations = Object.freeze({
+        'rhino.document.describe': { kind: 'read', approval: false },
+        'rhino.layer.create': { kind: 'change', approval: true }
+      })
+
+      function copy(value) {
+        return JSON.parse(JSON.stringify(value))
+      }
+
+      function createToken(sessionId, serial, now) {
+        return {
+          id: `access-${sessionId}-${serial}`,
+          valid: true,
+          issuedAt: now,
+          expiresAt: now + TOKEN_LIFETIME_MINUTES
+        }
+      }
+
+      function createSession(key, serial, now) {
+        const letter = key === 'session-alpha' ? 'A' : 'B'
+        const sessionId = `AIQ-${letter}-2048`
+        const documentId = `RHINO-DOC-${letter}`
+
+        return {
+          key,
+          sessionId,
+          workflow: 'Rhino Site Data Model 0.3.0',
+          connection: 'ready',
+          pipe: `\\\\.\\pipe\\AIQStudio.Rhino.${sessionId}`,
+          pipeOwner: 'Current Windows user',
+          token: createToken(sessionId, serial, now),
+          document: {
+            id: documentId,
+            name: `Site ${letter}.3dm`,
+            revision: 12
+          },
+          pendingRequest: null,
+          nextRequestNumber: 1,
+          tokenSerial: serial,
+          journal: []
+        }
+      }
+
+      function initialState(sessionCount = 1) {
+        const now = 0
+        const sessions = {
+          'session-alpha': createSession('session-alpha', 1, now)
+        }
+
+        if (sessionCount === 2) {
+          sessions['session-beta'] = createSession('session-beta', 1, now)
+        }
+
+        return {
+          now,
+          activeSessionKey: 'session-alpha',
+          sessions,
+          lastResult: 'The connection is ready. No request has run.',
+          lastResultKind: 'neutral'
+        }
+      }
+
+      function tokenStatus(session, now) {
+        if (!session.token.valid) return 'invalid'
+        if (now >= session.token.expiresAt) return 'expired'
+        return 'valid'
+      }
+
+      function addJournal(session, now, requestId, event, result) {
+        session.journal.push({
+          sequence: session.journal.length + 1,
+          minute: now,
+          requestId: requestId || '—',
+          event,
+          result
+        })
+      }
+
+      function setResult(state, message, kind = 'neutral') {
+        state.lastResult = message
+        state.lastResultKind = kind
+      }
+
+      function activeSession(state) {
+        return state.sessions[state.activeSessionKey]
+      }
+
+      function nextRequest(session, operation, input) {
+        const requestId = `${session.sessionId}-REQ-${session.nextRequestNumber}`
+        session.nextRequestNumber += 1
+
+        return {
+          requestId,
+          sessionId: session.sessionId,
+          documentId: session.document.id,
+          expectedRevision: session.document.revision,
+          tokenId: session.token.id,
+          operation,
+          input,
+          status: 'received',
+          approval: 'not-required'
+        }
+      }
+
+      function validateAccess(state, session, request) {
+        if (session.connection !== 'ready') {
+          return `The session is ${session.connection}. Resume it before a request.`
+        }
+
+        const access = tokenStatus(session, state.now)
+        if (access !== 'valid') {
+          return `Access is ${access}. Resume the session to get new access.`
+        }
+
+        if (request.tokenId !== session.token.id) {
+          return 'The request has the wrong access token.'
+        }
+
+        if (request.sessionId !== session.sessionId) {
+          return 'The request has the wrong session identity.'
+        }
+
+        if (request.documentId !== session.document.id) {
+          return 'The request has the wrong document identity.'
+        }
+
+        if (!operations[request.operation]) {
+          return 'The operation is not on the Rhino allowlist.'
+        }
+
+        return null
+      }
+
+      function runInspection(state, session) {
+        const request = nextRequest(session, 'rhino.document.describe', {})
+        const error = validateAccess(state, session, request)
+
+        if (error) {
+          request.status = 'denied'
+          addJournal(session, state.now, request.requestId, 'Request denied', error)
+          setResult(state, error, 'danger')
+          return
+        }
+
+        request.status = 'complete'
+        const result = `${session.document.name} is at revision ${session.document.revision}.`
+        addJournal(session, state.now, request.requestId, 'Read-only inspection', result)
+        setResult(state, `Inspection complete. ${result}`, 'success')
+      }
+
+      function prepareChange(state, session) {
+        const request = nextRequest(session, 'rhino.layer.create', {
+          layerName: 'AIQ::Site boundary'
+        })
+        const error = validateAccess(state, session, request)
+
+        if (error) {
+          request.status = 'denied'
+          addJournal(session, state.now, request.requestId, 'Request denied', error)
+          setResult(state, error, 'danger')
+          return
+        }
+
+        if (session.pendingRequest) {
+          const result = `Request ${session.pendingRequest.requestId} still needs a decision.`
+          addJournal(session, state.now, request.requestId, 'Request denied', result)
+          setResult(state, result, 'warning')
+          return
+        }
+
+        request.status = 'awaiting-approval'
+        request.approval = 'required'
+        session.pendingRequest = request
+        addJournal(
+          session,
+          state.now,
+          request.requestId,
+          'Preview ready',
+          `Create layer “${request.input.layerName}” at revision ${request.expectedRevision}.`
+        )
+        setResult(
+          state,
+          `Preview ready for ${request.requestId}. Rhino needs your approval.`,
+          'warning'
+        )
+      }
+
+      function approveChange(state, session) {
+        const request = session.pendingRequest
+
+        if (!request) {
+          setResult(state, 'There is no prepared request to approve.', 'warning')
+          addJournal(session, state.now, null, 'Approval denied', 'No prepared request exists.')
+          return
+        }
+
+        const error = validateAccess(state, session, request)
+        if (error) {
+          request.status = 'denied'
+          request.approval = 'not-granted'
+          addJournal(session, state.now, request.requestId, 'Approval denied', error)
+          setResult(state, error, 'danger')
+          return
+        }
+
+        if (request.expectedRevision !== session.document.revision) {
+          request.status = 'stale'
+          request.approval = 'not-granted'
+          const result = `Expected revision ${request.expectedRevision}, but Rhino is at revision ${session.document.revision}.`
+          addJournal(session, state.now, request.requestId, 'Stale request blocked', result)
+          setResult(state, `Rhino blocked the stale request. ${result}`, 'danger')
+          return
+        }
+
+        request.status = 'applied'
+        request.approval = 'granted-once'
+        session.document.revision += 1
+        addJournal(
+          session,
+          state.now,
+          request.requestId,
+          'Approved change applied',
+          `Created “${request.input.layerName}”. The document is now at revision ${session.document.revision}.`
+        )
+        session.pendingRequest = null
+        setResult(
+          state,
+          `Rhino applied ${request.requestId}. Its one-request approval is now used.`,
+          'success'
+        )
+      }
+
+      function rejectChange(state, session) {
+        const request = session.pendingRequest
+
+        if (!request) {
+          setResult(state, 'There is no prepared request to reject.', 'warning')
+          addJournal(session, state.now, null, 'Rejection ignored', 'No prepared request exists.')
+          return
+        }
+
+        request.status = 'rejected'
+        request.approval = 'rejected'
+        addJournal(
+          session,
+          state.now,
+          request.requestId,
+          'User rejected change',
+          'Rhino did not change the document.'
+        )
+        session.pendingRequest = null
+        setResult(state, `You rejected ${request.requestId}. Rhino made no change.`, 'success')
+      }
+
+      function externalEdit(state, session) {
+        session.document.revision += 1
+        addJournal(
+          session,
+          state.now,
+          null,
+          'Manual Rhino edit',
+          `The document is now at revision ${session.document.revision}.`
+        )
+        setResult(state, 'A manual Rhino edit changed the document revision.', 'warning')
+      }
+
+      function interruptSession(state, session) {
+        if (session.connection === 'interrupted') {
+          setResult(state, 'The session is already interrupted.', 'warning')
+          return
+        }
+
+        const cancelledRequestId = session.pendingRequest
+          ? session.pendingRequest.requestId
+          : null
+
+        session.connection = 'interrupted'
+        session.token.valid = false
+        session.pendingRequest = null
+        addJournal(
+          session,
+          state.now,
+          cancelledRequestId,
+          'Session interrupted',
+          cancelledRequestId
+            ? 'The connection closed. Rhino cancelled the pending approval.'
+            : 'The connection closed. No approval was pending.'
+        )
+        setResult(state, 'The session stopped. Its access is no longer valid.', 'warning')
+      }
+
+      function resumeSession(state, session) {
+        session.connection = 'ready'
+        session.tokenSerial += 1
+        session.token = createToken(session.sessionId, session.tokenSerial, state.now)
+        session.pendingRequest = null
+        addJournal(
+          session,
+          state.now,
+          null,
+          'Session resumed',
+          `Rhino issued ${session.token.id}. No old approval was restored.`
+        )
+        setResult(state, 'The session resumed with new access and no pending approval.', 'success')
+      }
+
+      function tryUnlistedOperation(state, session) {
+        const request = nextRequest(session, 'rhino.script.run-arbitrary', {
+          script: '_DeleteAll'
+        })
+        const error = validateAccess(state, session, request)
+        request.status = 'denied'
+        addJournal(session, state.now, request.requestId, 'Request denied', error)
+        setResult(state, error, 'danger')
+      }
+
+      function reduce(currentState, action) {
+        if (action.type === 'RESET_SINGLE') return initialState(1)
+        if (action.type === 'RESET_TWO') {
+          const state = initialState(2)
+          state.lastResult = 'Two isolated sessions are ready.'
+          return state
+        }
+
+        const state = copy(currentState)
+
+        if (action.type === 'SELECT_SESSION') {
+          if (state.sessions[action.sessionKey]) {
+            state.activeSessionKey = action.sessionKey
+            setResult(state, `Selected ${state.sessions[action.sessionKey].sessionId}.`)
+          }
+          return state
+        }
+
+        const session = activeSession(state)
+
+        switch (action.type) {
+          case 'INSPECT':
+            runInspection(state, session)
+            break
+          case 'PREPARE_CHANGE':
+            prepareChange(state, session)
+            break
+          case 'APPROVE':
+            approveChange(state, session)
+            break
+          case 'REJECT':
+            rejectChange(state, session)
+            break
+          case 'EXTERNAL_EDIT':
+            externalEdit(state, session)
+            break
+          case 'ADVANCE_TIME':
+            state.now += 6
+            setResult(state, 'Six minutes passed. Check the access state.', 'warning')
+            break
+          case 'INVALIDATE_TOKEN':
+            session.token.valid = false
+            addJournal(session, state.now, null, 'Access invalidated', 'Rhino revoked the token.')
+            setResult(state, 'Rhino revoked access for this session.', 'danger')
+            break
+          case 'INTERRUPT':
+            interruptSession(state, session)
+            break
+          case 'RESUME':
+            resumeSession(state, session)
+            break
+          case 'TRY_UNLISTED':
+            tryUnlistedOperation(state, session)
+            break
+        }
+
+        return state
+      }
+
+      function describe(state) {
+        const session = activeSession(state)
+        return {
+          now: state.now,
+          activeSessionKey: state.activeSessionKey,
+          sessionCount: Object.keys(state.sessions).length,
+          session: copy(session),
+          accessStatus: tokenStatus(session, state.now),
+          lastResult: state.lastResult,
+          lastResultKind: state.lastResultKind
+        }
+      }
+
+      return Object.freeze({
+        initialState,
+        reduce,
+        describe
+      })
+    })()
+
+    /* Throwaway page shell. It renders and drives the pure module above. */
+    const scenarios = [
+      {
+        id: 'inspect',
+        label: 'Inspect',
+        title: 'Read-only inspection',
+        description: 'A valid session reads the active document. No approval is needed and the revision does not change.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Inspect the document', action: { type: 'INSPECT' } }
+        ]
+      },
+      {
+        id: 'approve',
+        label: 'Approve',
+        title: 'Approved change',
+        description: 'The agent prepares one typed change. Rhino applies it only after approval for that request.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Prepare the layer change', action: { type: 'PREPARE_CHANGE' } },
+          { label: 'Approve the prepared request', action: { type: 'APPROVE' } },
+          { label: 'Try to use the approval again', action: { type: 'APPROVE' } }
+        ]
+      },
+      {
+        id: 'reject',
+        label: 'Reject',
+        title: 'Rejected change',
+        description: 'The user rejects the prepared request. Rhino records the decision and makes no change.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Prepare the layer change', action: { type: 'PREPARE_CHANGE' } },
+          { label: 'Reject the prepared request', action: { type: 'REJECT' } }
+        ]
+      },
+      {
+        id: 'stale',
+        label: 'Stale',
+        title: 'Stale document',
+        description: 'A manual Rhino edit changes the revision after the preview. Rhino must block the old request.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Prepare the layer change at revision 12', action: { type: 'PREPARE_CHANGE' } },
+          { label: 'Make a manual edit in Rhino', action: { type: 'EXTERNAL_EDIT' } },
+          { label: 'Try to approve the old request', action: { type: 'APPROVE' } }
+        ]
+      },
+      {
+        id: 'access',
+        label: 'Access',
+        title: 'Invalid or expired access',
+        description: 'Expired and revoked access must fail. Resume gives the session a new short-lived token.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Advance time past token expiry', action: { type: 'ADVANCE_TIME' } },
+          { label: 'Try to inspect with expired access', action: { type: 'INSPECT' } },
+          { label: 'Resume and get new access', action: { type: 'RESUME' } },
+          { label: 'Revoke the new access', action: { type: 'INVALIDATE_TOKEN' } },
+          { label: 'Try to inspect with invalid access', action: { type: 'INSPECT' } }
+        ]
+      },
+      {
+        id: 'resume',
+        label: 'Resume',
+        title: 'Interruption and resume',
+        description: 'An interruption cancels pending approval. Resume gives new access but cannot restore that approval.',
+        setup: { type: 'RESET_SINGLE' },
+        steps: [
+          { label: 'Prepare a change', action: { type: 'PREPARE_CHANGE' } },
+          { label: 'Interrupt the session', action: { type: 'INTERRUPT' } },
+          { label: 'Try to inspect while interrupted', action: { type: 'INSPECT' } },
+          { label: 'Resume with new access', action: { type: 'RESUME' } },
+          { label: 'Try to approve the cancelled request', action: { type: 'APPROVE' } },
+          { label: 'Inspect with the new access', action: { type: 'INSPECT' } }
+        ]
+      },
+      {
+        id: 'two-sessions',
+        label: 'Two sessions',
+        title: 'Two simultaneous sessions',
+        description: 'Each session has a different pipe, access token, document identity, request sequence, and journal.',
+        setup: { type: 'RESET_TWO' },
+        steps: [
+          { label: 'Inspect Site A in session A', action: { type: 'INSPECT' } },
+          { label: 'Select session B', action: { type: 'SELECT_SESSION', sessionKey: 'session-beta' } },
+          { label: 'Prepare a Site B change', action: { type: 'PREPARE_CHANGE' } },
+          { label: 'Approve the Site B request', action: { type: 'APPROVE' } },
+          { label: 'Return to session A', action: { type: 'SELECT_SESSION', sessionKey: 'session-alpha' } }
+        ]
+      }
+    ]
+
+    let state = ConnectionModel.initialState()
+    let activeScenarioId = scenarios[0].id
+    let walkthroughStep = -1
+
+    const summaryElement = document.querySelector('#summary')
+    const sessionTabsElement = document.querySelector('#session-tabs')
+    const lastResultElement = document.querySelector('#last-result')
+    const sessionStateElement = document.querySelector('#session-state')
+    const journalElement = document.querySelector('#journal')
+    const scenarioTabsElement = document.querySelector('#scenario-tabs')
+    const scenarioElement = document.querySelector('#scenario')
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
+    }
+
+    function label(value) {
+      return String(value).replaceAll('-', ' ')
+    }
+
+    function pillClass(value) {
+      if (['ready', 'valid', 'complete', 'applied'].includes(value)) return 'success'
+      if (['awaiting-approval', 'interrupted', 'expired'].includes(value)) return 'warning'
+      if (['invalid', 'stale', 'denied'].includes(value)) return 'danger'
+      return ''
+    }
+
+    function field(name, value, wide = false) {
+      return `
+        <div class="field${wide ? ' wide' : ''}">
+          <span class="field-label">${escapeHtml(name)}</span>
+          <span class="field-value">${escapeHtml(value)}</span>
+        </div>
+      `
+    }
+
+    function renderState() {
+      const view = ConnectionModel.describe(state)
+      const session = view.session
+      const request = session.pendingRequest
+
+      summaryElement.innerHTML = `
+        <span class="pill">Minute ${view.now}</span>
+        <span class="pill ${pillClass(session.connection)}">Connection: ${label(session.connection)}</span>
+        <span class="pill ${pillClass(view.accessStatus)}">Access: ${label(view.accessStatus)}</span>
+        <span class="pill">${view.sessionCount} active session${view.sessionCount === 1 ? '' : 's'}</span>
+      `
+
+      sessionTabsElement.innerHTML = Object.values(state.sessions).map((item) => `
+        <button
+          class="session-tab ${item.key === state.activeSessionKey ? 'active' : ''}"
+          data-session="${escapeHtml(item.key)}"
+        >
+          ${escapeHtml(item.sessionId)} · ${escapeHtml(item.document.name)}
+        </button>
+      `).join('')
+
+      lastResultElement.className = `notice ${view.lastResultKind}`
+      lastResultElement.innerHTML = `<strong>Last result:</strong> ${escapeHtml(view.lastResult)}`
+
+      const requestFields = request
+        ? `
+          <div class="subsection">
+            <h3>Prepared request</h3>
+            <div class="fields">
+              ${field('Request identity', request.requestId)}
+              ${field('Status', label(request.status))}
+              ${field('Typed operation', request.operation)}
+              ${field('Approval', label(request.approval))}
+              ${field('Session identity', request.sessionId)}
+              ${field('Access identity', request.tokenId)}
+              ${field('Document identity', request.documentId)}
+              ${field('Expected revision', request.expectedRevision)}
+              ${field('Typed input', `Layer name: ${request.input.layerName}`, true)}
+            </div>
+          </div>
+        `
+        : `
+          <div class="subsection">
+            <h3>Prepared request</h3>
+            <div class="empty">No request is waiting for approval.</div>
+          </div>
+        `
+
+      sessionStateElement.innerHTML = `
+        <div class="fields">
+          ${field('AIQ Session', session.sessionId)}
+          ${field('Workflow Package', session.workflow)}
+          ${field('Document', session.document.name)}
+          ${field('Document identity', session.document.id)}
+          ${field('Current revision', session.document.revision)}
+          ${field('Next request number', session.nextRequestNumber)}
+          ${field('Private named pipe', session.pipe, true)}
+          ${field('Pipe owner', session.pipeOwner)}
+          ${field('Access identity', session.token.id)}
+          ${field('Access issued', `Minute ${session.token.issuedAt}`)}
+          ${field('Access expires', `Minute ${session.token.expiresAt}`)}
+        </div>
+        ${requestFields}
+      `
+
+      if (session.journal.length === 0) {
+        journalElement.innerHTML = '<div class="empty">This session journal is empty.</div>'
+      } else {
+        journalElement.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Entry</th>
+                <th>Minute</th>
+                <th>Request</th>
+                <th>Event</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${session.journal.map((entry) => `
+                <tr>
+                  <td>${entry.sequence}</td>
+                  <td>${entry.minute}</td>
+                  <td>${escapeHtml(entry.requestId)}</td>
+                  <td>${escapeHtml(entry.event)}</td>
+                  <td>${escapeHtml(entry.result)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `
+      }
+
+      document.querySelectorAll('[data-session]').forEach((button) => {
+        button.addEventListener('click', () => {
+          dispatch({ type: 'SELECT_SESSION', sessionKey: button.dataset.session })
+        })
+      })
+    }
+
+    function renderScenarios() {
+      const scenario = scenarios.find((item) => item.id === activeScenarioId)
+
+      scenarioTabsElement.innerHTML = scenarios.map((item) => `
+        <button class="tab ${item.id === activeScenarioId ? 'active' : ''}" data-scenario="${item.id}">
+          ${escapeHtml(item.label)}
+        </button>
+      `).join('')
+
+      scenarioElement.innerHTML = `
+        <h3>${escapeHtml(scenario.title)}</h3>
+        <p class="scenario-description">${escapeHtml(scenario.description)}</p>
+        <button class="button primary" id="start-walkthrough">
+          ${walkthroughStep < 0 ? 'Start walkthrough' : 'Restart walkthrough'}
+        </button>
+        <div class="walkthrough-steps">
+          ${scenario.steps.map((step, index) => {
+            const status = walkthroughStep > index
+              ? 'done'
+              : walkthroughStep === index
+                ? 'current'
+                : ''
+            const marker = walkthroughStep > index ? '✓' : index + 1
+            return `
+              <button
+                class="walkthrough-step ${status}"
+                data-step="${index}"
+                ${walkthroughStep === index ? '' : 'disabled'}
+              >
+                <span class="step-number">${marker}</span>
+                <span>${escapeHtml(step.label)}</span>
+              </button>
+            `
+          }).join('')}
+        </div>
+      `
+
+      document.querySelectorAll('[data-scenario]').forEach((button) => {
+        button.addEventListener('click', () => {
+          activeScenarioId = button.dataset.scenario
+          walkthroughStep = -1
+          renderScenarios()
+        })
+      })
+
+      document.querySelector('#start-walkthrough').addEventListener('click', () => {
+        state = ConnectionModel.reduce(state, scenario.setup)
+        walkthroughStep = 0
+        render()
+      })
+
+      document.querySelectorAll('[data-step]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const index = Number(button.dataset.step)
+          if (index !== walkthroughStep) return
+          state = ConnectionModel.reduce(state, scenario.steps[index].action)
+          walkthroughStep += 1
+          render()
+        })
+      })
+    }
+
+    function dispatch(action) {
+      state = ConnectionModel.reduce(state, action)
+      renderState()
+    }
+
+    function render() {
+      renderState()
+      renderScenarios()
+    }
+
+    document.querySelectorAll('[data-action]').forEach((button) => {
+      button.addEventListener('click', () => dispatch({ type: button.dataset.action }))
+    })
+
+    render()
+  </script>
+</body>
+</html>
