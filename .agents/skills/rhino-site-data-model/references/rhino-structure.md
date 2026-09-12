@@ -61,6 +61,9 @@ Use generic classes for layer names. Keep the exact source class, subtype, taxon
 ## Geometry rules
 
 - Preserve polygon holes and multipolygon parts.
+- Normalize polygon rings before mesh creation. Use counter-clockwise exterior rings and clockwise hole rings for building walls and terrain skirts.
+- Compute and store normals on each generated mesh.
+- Set the document to render backfaces so open mesh faces are visible from both sides. When Rhino is available, run `scripts/disable_backface_culling.py` inside Rhino to turn off the separate application-level viewport setting.
 - Clip working geometry to the context before conversion to Rhino geometry.
 - Put clipped-part indices on derived objects.
 - Keep points as points and linear networks as curves unless the user asks for widths or surfaces.

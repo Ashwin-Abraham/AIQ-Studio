@@ -10,10 +10,18 @@ from pathlib import Path
 
 import rhino3dm as r3d
 from shapely.geometry import Polygon
+from shapely.geometry.polygon import orient
 from shapely.ops import triangulate
 
 FLOOR_HEIGHT = 3.5
 ROOT = "AIQ Site"
+
+
+def finalize_mesh(mesh):
+    mesh.Compact()
+    mesh.Normals.ComputeNormals()
+    mesh.Normals.UnitizeNormals()
+    return mesh
 
 
 def safe_name(value):
@@ -68,15 +76,19 @@ class TerrainSampler:
             for column_index in range(self.column_count - 1):
                 a = row_index * self.column_count + column_index
                 mesh.Faces.AddFace(a, a + 1, a + 1 + self.column_count, a + self.column_count)
-        mesh.Compact()
-        return mesh
+        return finalize_mesh(mesh)
 
 
 def polygon_from_part(part):
     outer = [(point[0], point[1]) for point in part["points"]]
     holes = [[(point[0], point[1]) for point in ring] for ring in part.get("holes", [])]
     polygon = Polygon(outer, holes)
-    return polygon if polygon.is_valid else polygon.buffer(0)
+    polygon = polygon if polygon.is_valid else polygon.buffer(0)
+    return orient(polygon, sign=1.0)
+
+
+def polygon_rings(polygon):
+    return [list(polygon.exterior.coords)] + [list(ring.coords) for ring in polygon.interiors]
 
 
 def reference_ground(part, sampler):
@@ -136,8 +148,7 @@ def part_bottom_rule(record):
 
 def flat_mass(part, bottom_z, top_z):
     polygon = polygon_from_part(part)
-    rings = [[(point[0], point[1]) for point in part["points"]]]
-    rings.extend([[(point[0], point[1]) for point in ring] for ring in part.get("holes", [])])
+    rings = polygon_rings(polygon)
     mesh = r3d.Mesh()
     for ring in rings:
         for index in range(len(ring) - 1):
@@ -161,17 +172,16 @@ def flat_mass(part, bottom_z, top_z):
         for x, y in points:
             mesh.Vertices.Add(x, y, bottom_z)
         mesh.Faces.AddFace(bottom + 2, bottom + 1, bottom)
-    mesh.Compact()
-    return mesh
+    return finalize_mesh(mesh)
 
 
 def terrain_skirt(part, base_z, sampler):
     mesh = r3d.Mesh()
-    rings = [part["points"]] + list(part.get("holes", []))
+    rings = polygon_rings(polygon_from_part(part))
     for ring in rings:
         for index in range(len(ring) - 1):
-            x0, y0, _ = ring[index]
-            x1, y1, _ = ring[index + 1]
+            x0, y0 = ring[index]
+            x1, y1 = ring[index + 1]
             if math.hypot(x1 - x0, y1 - y0) < 1e-8:
                 continue
             ground_0 = sampler.z(x0, y0)
@@ -197,8 +207,7 @@ def terrain_skirt(part, base_z, sampler):
                 mesh.Vertices.Add(x1, y1, base_z)
                 mesh.Vertices.Add(x0, y0, base_z)
                 mesh.Faces.AddFace(start, start + 1, start + 2, start + 3)
-    mesh.Compact()
-    return mesh
+    return finalize_mesh(mesh)
 
 
 def main():
@@ -216,6 +225,7 @@ def main():
     model.Settings.ModelUnitSystem = r3d.UnitSystem.Meters
     model.Settings.ModelAbsoluteTolerance = 0.001
     model.Settings.ModelAngleToleranceDegrees = 1.0
+    model.Settings.RenderSettings.RenderBackFaces = True
     document_values = {
         "site.name": run["site_name"],
         "site.generated_utc": run["generated_utc"],
@@ -228,6 +238,7 @@ def main():
         "site.source_manifest": run["source_manifest_path"],
         "site.report": run["report_path"],
         "site.height_rules": "3.5 m floor; 3-floor occupied fallback; 1-floor small-building and building-part fallback",
+        "site.render_backfaces": "true",
     }
     for key, value in document_values.items():
         model.Strings[key] = str(value)
