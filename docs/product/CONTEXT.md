@@ -17,7 +17,7 @@ An application that supplies an AI agent which can load and run AIQ Studio workf
 _Avoid_: Model, provider, chatbot
 
 **Host Plug-in**:
-The AIQ Studio plug-in installed in a Host Application. It owns the applicable Workflow Packages and is the sole authority that creates AIQ Sessions for that Host Application.
+The AIQ Studio plug-in installed in a Host Application. It owns the applicable Workflow Packages, host access, user controls, and branded outputs, and it is the sole authority that creates AIQ Sessions for that Host Application.
 _Avoid_: Rhino plug-in when referring to the general product role
 
 **Harness Plug-in**:
