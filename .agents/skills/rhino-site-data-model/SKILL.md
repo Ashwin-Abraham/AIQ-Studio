@@ -20,6 +20,11 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 - Record validation failures. Do not stop model generation only because a validation check fails.
 - Do not overwrite or modify an existing model unless the user has authorized that target and its state is safe.
 
+## Project guidance
+
+- Read [Python scripting guidance](../../PYTHON-SCRIPTING-GUIDANCE.md) before you create or adapt Python scripts, manage dependencies, or select a runtime environment.
+- Read [project folder organisation](../../PROJECT-FOLDER-ORGANISATION.md) before you create project folders or place models, source data, processed data, reports, scripts, or exports.
+
 ## Workflow
 
 1. Resolve the site and target Rhino model. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.

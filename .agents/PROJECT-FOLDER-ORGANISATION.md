@@ -6,7 +6,9 @@ This document defines the expected folder structure for an installed AIQ Studio 
 
 ## Workspace root
 
-The installation process creates an `AIQ Studio` folder. Treat this folder as the workspace root.
+The installation process creates an `AIQ Studio` folder. Use this folder as the workspace root.
+
+The user can specify an existing file to edit. In this case, use the folder that contains the specified file as the project root.
 
 ```text
 AIQ Studio/
