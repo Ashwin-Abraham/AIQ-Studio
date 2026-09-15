@@ -71,13 +71,3 @@ Use generic classes for layer names. Keep the exact source class, subtype, taxon
 - Put unresolved bridges, tunnels, underground segments, and conflicting level rules in a separate unresolved layer. Do not infer their Z position.
 - Do not infer water elevation. A terrain-draped water curve is only a comparison geometry and must say so in metadata.
 
-## Existing models
-
-An initial, explicit request to modify a named model is sufficient authorization. Ask before modification when:
-
-- the target file is unclear;
-- the model is open with unsaved changes;
-- the file is locked;
-- the proposed change is materially different from the request.
-
-Create a new, clear filename when safe modification is not possible. Do not close or save an unrelated open model.
