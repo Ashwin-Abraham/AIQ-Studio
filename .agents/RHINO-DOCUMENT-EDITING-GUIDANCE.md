@@ -56,6 +56,7 @@ For each visible stage or batch:
 - Add or update a bounded set of objects.
 - Update the Rhino status-bar progress meter.
 - Redraw the document views.
+- Periodically zoom the active views to the extents of the geometry created in the recent batches.
 - Check for user cancellation.
 - Confirm that the captured document is still the target.
 - Record created, updated, skipped, and failed object counts.
@@ -63,8 +64,6 @@ For each visible stage or batch:
 Select batch size from elapsed time and Rhino responsiveness. Do not require one fixed object count for all geometry types. Expensive meshes can need smaller batches than points or curves.
 
 Do not disable redraw for the complete operation when progressive display is required. Redraw at useful intervals instead of after every object.
-
-Do not use one large `RhinoDoc.Import` operation when the user must see geometry appear progressively. Read or prepare the source content first, map its document definitions, and add its objects to the active document in batches. Use `Import` only when an atomic, all-at-once result is acceptable.
 
 ## Rhino interface responsiveness
 
