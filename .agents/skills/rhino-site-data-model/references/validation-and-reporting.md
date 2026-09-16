@@ -32,6 +32,26 @@ When Rhino control is available:
 
 If visual inspection is not possible, create a preview when practical and state the limitation in the final report.
 
+### Viewport setup in Rhino Python
+
+Use the following code after you obtain the active Rhino document as `doc`:
+
+```python
+view = doc.Views.ActiveView
+vp = view.ActiveViewport
+
+vp.ConstructionGridVisible = False
+vp.ConstructionAxesVisible = False
+
+mode = Rhino.Display.DisplayModeDescription.FindByName("Shaded")
+if mode is not None:
+    vp.DisplayMode = mode
+
+doc.Views.Redraw()
+```
+
+Do not assign `vp.WorldAxesIconVisible`. The Rhino 8 `RhinoViewport` used by this workflow does not support that property. The assignment raises an `AttributeError` and stops the script before view capture or model save. Leave the world-axis icon at its current setting. If the Shaded display mode is not available, keep the current display mode.
+
 ## Required outputs
 
 - Rhino model.
