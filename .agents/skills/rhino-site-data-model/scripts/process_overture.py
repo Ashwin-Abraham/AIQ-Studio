@@ -9,6 +9,9 @@ from pathlib import Path
 from pyproj import CRS, Transformer
 from shapely.geometry import GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, box, mapping, shape
 from shapely.ops import transform
+from shapely import make_valid
+from site_model.contract import atomic_json, file_sha256, load_json, validate_sources
+from download_overture import validate_types
 
 FEATURE_TYPES = ["building", "building_part", "segment", "connector", "water", "land", "land_use", "place"]
 
@@ -25,7 +28,7 @@ def read_geojson_geometry(path):
 
 
 def clean(value):
-    value = str(value or "Other Unclassified").replace("-", " ").replace("_", " ")
+    value = str(value or "Other Unclassified").replace("-", " ").replace("_", " ").replace("::", " ")
     return " ".join(part.capitalize() for part in value.split())
 
 
@@ -66,14 +69,14 @@ def flatten(geometry):
     if isinstance(geometry, Point):
         return [{"kind": "Point", "points": [[geometry.x, geometry.y, 0.0]]}]
     if isinstance(geometry, LineString):
-        points = [[x, y, 0.0] for x, y in geometry.coords]
+        points = [[x, y, 0.0] for x, y, *_ in geometry.coords]
         return [{"kind": "LineString", "points": points}] if len(points) >= 2 else []
     if isinstance(geometry, Polygon):
         return [
             {
                 "kind": "Polygon",
-                "points": [[x, y, 0.0] for x, y in geometry.exterior.coords],
-                "holes": [[[x, y, 0.0] for x, y in ring.coords] for ring in geometry.interiors],
+                "points": [[x, y, 0.0] for x, y, *_ in geometry.exterior.coords],
+                "holes": [[[x, y, 0.0] for x, y, *_ in ring.coords] for ring in geometry.interiors],
             }
         ]
     if isinstance(geometry, (MultiPoint, MultiLineString, MultiPolygon, GeometryCollection)):
@@ -84,94 +87,92 @@ def flatten(geometry):
     return []
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", required=True)
-    parser.add_argument("--site", required=True, help="WGS84 site Polygon or MultiPolygon GeoJSON")
-    parser.add_argument("--context", required=True, help="JSON from derive_context.py")
-    parser.add_argument("--manifest", required=True)
-    parser.add_argument("--site-name", required=True)
-    parser.add_argument("--output", required=True)
-    parser.add_argument("--report-path", required=True)
-    parser.add_argument("--terrain", help="Optional terrain JSON containing provider, dataset, vertical_datum, and rows")
-    args = parser.parse_args()
+def leaf_geometries(geometry):
+    if isinstance(geometry, (MultiPoint, MultiLineString, MultiPolygon, GeometryCollection)):
+        for item in geometry.geoms:
+            yield from leaf_geometries(item)
+    elif not geometry.is_empty:
+        yield geometry
 
-    input_dir = Path(args.input_dir).resolve()
-    context_data = json.loads(Path(args.context).read_text(encoding="utf-8"))
-    manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
-    target_crs = CRS.from_user_input(context_data["projected_crs"])
-    forward = Transformer.from_crs(4326, target_crs, always_xy=True)
-    origin_x, origin_y = context_data["origin_projected"]
 
-    def to_local(x, y, z=None):
-        projected_x, projected_y = forward.transform(x, y)
-        return projected_x - origin_x, projected_y - origin_y
-
-    site_local = transform(to_local, read_geojson_geometry(args.site))
-    context_bounds = context_data["context_bounds_local"]
-    context_geometry = box(*context_bounds)
+def normalize_features(collections, to_local, context_geometry):
+    """Normalize selected cached collections without terrain or file writes."""
     records = []
-
-    for feature_type in FEATURE_TYPES:
-        path = input_dir / (feature_type + ".geojson")
-        if not path.exists():
-            continue
-        collection = json.loads(path.read_text(encoding="utf-8"))
-        for feature in collection.get("features", []):
-            source_geometry = transform(to_local, shape(feature["geometry"]))
-            if not source_geometry.is_valid:
-                source_geometry = source_geometry.buffer(0)
-            clipped = source_geometry.intersection(context_geometry)
-            parts = flatten(clipped)
+    for feature_type, collection in collections.items():
+        validate_types([feature_type])
+        if collection.get('type') != 'FeatureCollection' or not isinstance(collection.get('features'),list):
+            raise ValueError('Source must be a GeoJSON FeatureCollection')
+        for source_feature_index, feature in enumerate(collection['features']):
+            if feature.get('geometry') is None:
+                raise ValueError('Source feature has no geometry')
+            source_geometry = transform(to_local, shape(feature['geometry']))
+            parts = []
+            repaired = not source_geometry.is_valid
+            for source_part_index, source_part in enumerate(leaf_geometries(source_geometry)):
+                valid = source_part if source_part.is_valid else make_valid(source_part)
+                clipped = valid.intersection(context_geometry)
+                for part in flatten(clipped):
+                    part['source_part_index'] = source_part_index
+                    part['clipped_part_index'] = len(parts)
+                    parts.append(part)
             if not parts:
                 continue
-            properties = feature.get("properties") or {}
-            for index, part in enumerate(parts):
-                part["clipped_part_index"] = index
-            records.append(
-                {
-                    "id": feature.get("id"),
-                    "feature_type": feature_type,
-                    "version": properties.get("version"),
-                    "name": name_of(properties),
-                    "category_path": category(feature_type, properties),
-                    "properties": properties,
-                    "sources": properties.get("sources") or [],
-                    "source_bounds_local": list(source_geometry.bounds),
-                    "parts": parts,
-                }
-            )
+            properties = feature.get('properties') or {}
+            records.append({'id':feature.get('id'), 'feature_type':feature_type, 'version':properties.get('version'), 'name':name_of(properties), 'category_path':category(feature_type,properties), 'properties':properties, 'sources':properties.get('sources') or [], 'source_feature_index':source_feature_index, 'source_bounds_local':list(source_geometry.bounds), 'geometry_repaired':repaired, 'parts':parts})
+    return records
 
-    context_part = flatten(context_geometry)[0]
-    terrain = json.loads(Path(args.terrain).read_text(encoding="utf-8")) if args.terrain else {}
-    output = {
-        "run": {
-            "site_name": args.site_name,
-            "generated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
-            "semantic_source": "Overture Maps",
-            "source_release": manifest.get("release") or "unknown",
-            "projected_crs": context_data["projected_crs"],
-            "origin_wgs84": context_data["origin_wgs84"],
-            "origin_projected": context_data["origin_projected"],
-            "vertical_datum": terrain.get("vertical_datum") or "not set",
-            "source_manifest_path": str(Path(args.manifest).resolve()),
-            "report_path": args.report_path,
-        },
-        "site": {"parts": flatten(site_local)},
-        "context": {
-            "parts": [context_part],
-            "bounds_local": context_bounds,
-            "bounds_wgs84": context_data["context_bounds_wgs84"],
-            "selection_method": context_data["context_selection_method"],
-        },
-        "terrain": terrain,
-        "features": records,
-    }
+
+def process_sources(collections, site_geometry, context_data, manifest, site_name, manifest_path, report_path, generated_utc=None):
+    """Return checked 2D source data. All geometry uses local metres at Z=0.
+
+    Each invocation owns its output. Independent theme workers can pass separate
+    collections and write separate files; they never change the source manifest.
+    """
+    target_crs = CRS.from_user_input(context_data['projected_crs'])
+    if not target_crs.is_projected or any(axis.unit_conversion_factor != 1 for axis in target_crs.axis_info[:2]):
+        raise ValueError('The projected CRS must use metres')
+    forward = Transformer.from_crs(4326,target_crs,always_xy=True)
+    origin_x,origin_y = context_data['origin_projected']
+    def to_local(x,y,z=None):
+        projected_x,projected_y = forward.transform(x,y,errcheck=True)
+        return projected_x-origin_x,projected_y-origin_y
+    site_local = transform(to_local,site_geometry)
+    if not site_local.is_valid:
+        site_local = make_valid(site_local)
+    context_bounds = context_data['context_bounds_local']
+    context_geometry = box(*context_bounds)
+    release = manifest.get('release')
+    if not isinstance(release,str) or not release.strip() or release in {'unknown','latest'}:
+        raise ValueError('Source manifest must identify its resolved release')
+    result = {'run':{'site_name':site_name,'generated_utc':generated_utc or dt.datetime.now(dt.timezone.utc).isoformat(),'semantic_source':'Overture Maps','source_release':release,'projected_crs':context_data['projected_crs'],'origin_wgs84':context_data['origin_wgs84'],'origin_projected':context_data['origin_projected'],'vertical_datum':'not set','source_manifest_path':str(manifest_path),'report_path':str(report_path)},'site':{'parts':flatten(site_local)},'context':{'parts':flatten(context_geometry),'bounds_local':context_bounds,'bounds_wgs84':context_data['context_bounds_wgs84'],'selection_method':context_data['context_selection_method']},'features':normalize_features(collections,to_local,context_geometry)}
+    return validate_sources(result)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input-dir',required=True)
+    parser.add_argument('--site',required=True,help='WGS84 site Polygon or MultiPolygon GeoJSON')
+    parser.add_argument('--context',required=True,help='JSON from derive_context.py')
+    parser.add_argument('--manifest',required=True)
+    parser.add_argument('--site-name',required=True)
+    parser.add_argument('--output',required=True,help='Unique normalized source output for this invocation')
+    parser.add_argument('--report-path',required=True)
+    parser.add_argument('--types',nargs='+',choices=FEATURE_TYPES,help='Only process these types; omitted means all available files')
+    args = parser.parse_args()
+    input_dir = Path(args.input_dir).resolve()
+    manifest = load_json(args.manifest)
+    selected = validate_types(args.types if args.types is not None else [kind for kind in FEATURE_TYPES if (input_dir/(kind+'.geojson')).exists()])
+    manifest_records = {record['feature_type']:record for record in manifest.get('files',[])}
+    collections = {}
+    for kind in selected:
+        path = input_dir/(kind+'.geojson')
+        if kind not in manifest_records or manifest_records[kind].get('sha256') != file_sha256(path):
+            raise ValueError('Source file does not match its manifest: '+kind)
+        collections[kind] = load_json(path)
+    result = process_sources(collections,read_geojson_geometry(args.site),load_json(args.context),manifest,args.site_name,str(Path(args.manifest).resolve()),args.report_path)
     output_path = Path(args.output).resolve()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"output": str(output_path), "feature_count": len(records), "geometry_part_count": sum(len(record["parts"]) for record in records)}, indent=2))
+    atomic_json(output_path,result)
+    print(json.dumps({'output':str(output_path),'feature_count':len(result['features']),'geometry_part_count':sum(len(record['parts']) for record in result['features'])},indent=2))
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

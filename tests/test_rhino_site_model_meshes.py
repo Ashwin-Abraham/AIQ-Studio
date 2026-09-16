@@ -1,4 +1,3 @@
-import importlib.util
 import json
 import subprocess
 import sys
@@ -10,17 +9,17 @@ import rhino3dm as r3d
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-BUILDER_PATH = (
+SCRIPTS_PATH = (
     REPO_ROOT
     / ".agents"
     / "skills"
     / "rhino-site-data-model"
     / "scripts"
-    / "build_rhino_site_model.py"
 )
-SPEC = importlib.util.spec_from_file_location("build_rhino_site_model", BUILDER_PATH)
-BUILDER = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(BUILDER)
+sys.path.insert(0, str(SCRIPTS_PATH))
+from site_model import geometry as BUILDER
+
+RUNNER_PATH = SCRIPTS_PATH / "run_site_model.py"
 
 
 def face_normal(mesh, face_index):
@@ -105,9 +104,8 @@ class SiteMeshTests(unittest.TestCase):
                 "source_manifest_path": "test-manifest.json",
                 "report_path": "test-report.md",
             },
-            "site": {"parts": []},
-            "context": {"parts": [], "bounds_local": [-1, -1, 1, 1]},
-            "terrain": {"rows": []},
+            "site": {"parts": [self.part]},
+            "context": {"parts": [self.part], "bounds_local": [0, 0, 4, 4]},
             "features": [],
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -115,7 +113,9 @@ class SiteMeshTests(unittest.TestCase):
             output_path = Path(directory) / "output.3dm"
             input_path.write_text(json.dumps(data), encoding="utf-8")
             subprocess.run(
-                [sys.executable, str(BUILDER_PATH), "--input", str(input_path), "--output", str(output_path)],
+                [sys.executable, "-B", str(RUNNER_PATH), "--project-root", directory,
+                 "--input", str(input_path), "--output", str(output_path),
+                 "--backend", "file", "--stage", "all", "--flat-elevation", "0"],
                 check=True,
                 capture_output=True,
                 text=True,
