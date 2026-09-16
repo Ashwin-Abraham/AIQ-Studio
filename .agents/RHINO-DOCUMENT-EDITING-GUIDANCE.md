@@ -53,6 +53,7 @@ Within each stage, process objects in bounded batches. Apply attributes and meta
 
 For each batch:
 
+- Set the batch size to give about 5–6 batches per stage. Use more batches only when needed to keep Rhino responsive.
 - Confirm that the captured document is still the target.
 - Check for user cancellation.
 - Add or update the objects.
