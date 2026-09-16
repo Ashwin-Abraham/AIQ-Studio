@@ -72,6 +72,35 @@ def prepare_worker(job_path, result_path):
         raise RuntimeError("Cannot write prepared worker result")
 
 
+def _preflight_preparation(workers, worker_python):
+    """Validate preparation dependencies before a writer transaction starts."""
+    if not worker_python and workers == 1:
+        try:
+            from . import geometry  # noqa: F401
+        except ImportError as error:
+            raise RuntimeError("In-process geometry preparation dependencies are unavailable: " + str(error)) from error
+        return None
+
+    executable = str(worker_python or sys.executable)
+    if not worker_python and Path(executable).name.lower() not in ("python.exe", "python", "python3", "python3.exe"):
+        raise ValueError("Set --worker-python to a managed Python executable for parallel work inside Rhino")
+    if worker_python and not Path(executable).is_file():
+        raise ValueError("The managed Python executable is not visible from the current Rhino process: " + executable)
+
+    environment = os.environ.copy()
+    environment.pop("PYTHONHOME", None)
+    command = [executable, "-B", "-c", "import rhino3dm, shapely; print('site-model-worker-ok')"]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30,
+                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0), env=environment)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise RuntimeError("Geometry worker preflight failed: " + str(error)) from error
+    if result.returncode or "site-model-worker-ok" not in result.stdout:
+        details = (result.stderr or result.stdout or "no worker output")[-4000:]
+        raise RuntimeError("Geometry worker preflight failed: " + details)
+    return executable
+
+
 def _prepared(data, stage, terrain, flat_elevation, workers, partition_size, worker_python, pump):
     jobs = iter(_partitions(data, partition_size, stage))
     if not worker_python:
@@ -86,8 +115,6 @@ def _prepared(data, stage, terrain, flat_elevation, workers, partition_size, wor
         return
     import rhino3dm as r3d
     executable = str(worker_python or sys.executable)
-    if Path(executable).name.lower() not in ("python.exe", "python", "python3", "python3.exe") and worker_python is None:
-        raise ValueError("Set --worker-python to a managed Python executable for parallel work inside Rhino")
     entry = Path(__file__).resolve().parents[1] / "run_site_model.py"
     with tempfile.TemporaryDirectory(prefix="site-preparation-") as temporary:
         directory = Path(temporary)
@@ -183,6 +210,7 @@ def run(project_root, input_path, output_path, stage="all", backend="live", terr
             raise ValueError("3D requires either terrain or an explicit flat elevation")
         if flat_elevation is not None and (isinstance(flat_elevation, bool) or not math.isfinite(flat_elevation)):
             raise ValueError("Flat elevation must be finite")
+    worker_python = _preflight_preparation(workers, worker_python)
     from .writer import FileWriter, RhinoWriter
     from .audit import audit_file
     writer_type = writer_factory or (FileWriter if backend == "file" else RhinoWriter)

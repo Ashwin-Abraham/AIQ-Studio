@@ -63,9 +63,19 @@ class WorkflowTests(unittest.TestCase):
     def test_external_worker_failure_rolls_back(self):
         self.run_stage("2d")
         before = file_sha256(self.output)
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaisesRegex(ValueError, "not visible"):
             self.run_stage("2d", workers=2, worker_python=str(self.root / "missing-python.exe"))
         self.assertEqual(before, file_sha256(self.output))
+
+    def test_worker_preflight_happens_before_writer_construction(self):
+        calls = []
+        def writer_factory(*args, **kwargs):
+            calls.append((args, kwargs))
+            raise AssertionError("writer must not be constructed")
+        with self.assertRaisesRegex(ValueError, "not visible"):
+            run(self.root, self.source, self.output, stage="2d", backend="live", workers=2,
+                worker_python=str(self.root / "missing-python.exe"), writer_factory=writer_factory)
+        self.assertEqual(calls, [])
 
     def test_terrain_run_uses_the_checked_frame(self):
         terrain = self.root / "terrain.json"
