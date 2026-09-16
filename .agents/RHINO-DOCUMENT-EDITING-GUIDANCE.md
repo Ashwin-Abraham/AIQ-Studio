@@ -8,6 +8,14 @@ Prefer to open the target Rhino document before an editing workflow starts. If t
 
 Workflow-specific skills can add stricter geometry, layer, metadata, and validation rules.
 
+## Visible progress
+
+The user must see visible progress in stages to help them understand what is being created and edited progressively. They should see the model develop in Rhino.
+
+Edit the open target document in stages, redraw after each batch, and show progress. Keep Rhino responsive.
+
+Offline preparation is allowed. Do not substitute a completed file for progressive edits without user approval.
+
 ## Confirm the target document
 
 Before an edit:
@@ -24,20 +32,11 @@ Ask the user before editing when the active document has unsaved changes that th
 
 Do not close or save an unrelated document.
 
-## Choose the editing method
+## Computer use
 
-Use RhinoCommon inside Rhino for live document changes. Offline libraries can prepare geometry or create a separate `.3dm`, but they do not provide progressive edits to the open Rhino document.
+Use APIs and scripts for Rhino operations. Computer-use tools, desktop screen capture, and mouse or keyboard automation are forbidden unless no suitable programmatic method is available and the user explicitly approves the specific action.
 
-Use this separation:
-
-1. Prepare and validate input data without changing the document.
-2. Pass the prepared data to one maintained Rhino editing entry point.
-3. Apply document changes through the captured `RhinoDoc`.
-4. Report progress, allow cancellation, and redraw during the edit.
-
-Do not create a new project-specific bridge script only to connect an external process to Rhino. Prefer a maintained runner that accepts the target document identity, operation name, input path, and settings.
-
-Avoid hard-coded model paths in reusable Rhino editing code.
+Explain the need and scope before requesting approval. An API failure does not grant approval. This restriction also applies to starting scripts through the Rhino interface. Image capture through the Rhino API does not require computer-use approval.
 
 ## Progressive editing
 
@@ -118,9 +117,13 @@ Use the open document's valid units, tolerances, axes, and georeferencing. Trans
 
 Restore the active view, projection, selection, layer states, and display settings after a temporary visual check. Do not save temporary review settings unless they are part of the requested result.
 
+For image capture, use the [rhino-image-capture skill](skills/rhino-image-capture/SKILL.md) and its reusable script. It captures images through the Rhino API for review, progress records, or other uses and restores temporary camera settings. It does not perform validation or connect an external process to Rhino.
+
 ## Validation
 
 Validate each completed stage enough to prevent invalid state from accumulating. Run full validation after the final mutation.
+
+Validate through RhinoCommon and saved-file checks. Capture review images through the Rhino API. Preserve the user's view and selection. Report unavailable checks as incomplete. A captured image is not a completed visual check; inspect it and record the result.
 
 When the workflow saves the document, confirm that the saved `.3dm` can be read again. Inspect useful views and report all failed checks. Do not describe a failed check as successful.
 
