@@ -51,6 +51,8 @@ Terrain can be absent. When present:
 
 Rows must form a regular or affine grid. The build script uses bilinear height sampling.
 
+Do not remove terrain data or mesh faces beneath mapped water.
+
 ## Feature
 
 ```json
