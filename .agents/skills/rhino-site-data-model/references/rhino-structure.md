@@ -11,6 +11,8 @@
 
 For an existing model, use its valid units and georeferencing. Transform the site data into that system. Do not change existing units or the Earth Anchor without explicit approval. If georeferencing is incomplete or contradictory, stop and ask before geometry creation.
 
+The current writer accepts metre-based documents with matching `site.projected_crs`, `site.origin_projected`, and `site.origin_wgs84` user text. It rejects other existing frames; it does not convert their units or coordinates automatically.
+
 ## Root and branches
 
 Use this base structure. Add only category layers that contain objects.
@@ -28,6 +30,7 @@ AIQ Site::
     Water::
     Land Use::
     Places::
+    QA::Annotations::Run Info::
   3D::
     Boundary::
     Terrain::
@@ -47,14 +50,12 @@ AIQ Site::
     Water::
     Land Use::
     Places::
-  Sources::
-  QA::
-    Annotations::
-      Run Info::
-    Validation::
+    QA::Annotations::Run Info::
 ```
 
-The `2D` parent is hidden by default. Its geometry is always present at Z = 0. The 2D and 3D branches use the same XY position so the user can compare them.
+The `2D` parent is visible during a 2D run. Hide it when the 3D stage is complete, and show the `3D` parent. Source geometry stays at Z = 0. Both branches use the same XY position so the user can compare them.
+
+Generated objects use `site_owner = rhino-site-data-model`, `site_stage`, and a stable `site_key`. Use these fields to replace stage outputs. Preserve user objects, including objects on generated layers. Do not infer ownership from a layer name. The [staged workflow](staged-workflow.md) defines replacement and checkpoint rules.
 
 Use generic classes for layer names. Keep the exact source class, subtype, taxonomy, and other fields as metadata.
 

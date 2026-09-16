@@ -2,11 +2,13 @@
 
 Use Overture `Building` and `BuildingPart` fields before fallback rules. Keep the property-level source for each height value.
 
+Apply these rules only in the 3D stage, after the complete 2D model is checked and saved. Read the same shared source features; do not make 2D processing depend on height or terrain processing.
+
 ## Reference ground elevation
 
 Sample the terrain inside and along the building footprint. Use the highest valid sample as the flat reference ground elevation. Record the sample method, terrain source, and sample count.
 
-If terrain data is absent, use Z = 0 and state that the building has no terrain placement.
+If terrain data is absent, require an explicit flat elevation, such as `--flat-elevation 0`. Record that elevation and state that the building has no terrain placement. Do not silently assume Z = 0.
 
 ## Main building height
 
@@ -32,6 +34,8 @@ Store `height_method`, `height_is_estimated`, floor-to-floor value, and the inpu
 - Put skirts on `AIQ Site::3D::Buildings::Terrain Skirts`.
 
 The skirt is terrain-adjustment geometry. It is not part of the source building height.
+
+Create terrain skirts only when terrain is present. A flat-placement run has no terrain skirts.
 
 ## Building parts
 

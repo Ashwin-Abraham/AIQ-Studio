@@ -37,6 +37,12 @@ Use Overture Maps by default for:
 
 Use the latest Overture release unless the user pins a release. Record the release ID, retrieval time, download bounds, file hashes, and tool versions.
 
+Use `scripts/download_overture.py` with `--types` to select themes and `--workers 1` through `--workers 4` to select acquisition concurrency. Parallel acquisition requires an explicit `--release` so every worker uses the same release. A sequential download can resolve the first release and pin it for later themes. Give separate download invocations separate output directories; each invocation publishes one manifest after its downloads succeed.
+
+Use `scripts/process_overture.py` to normalize the cache without terrain. It requires `--input-dir`, `--site`, `--context`, `--manifest`, `--site-name`, `--output`, and `--report-path`. Use `--types` for a selected subset; otherwise it reads available supported theme files. Each selected file must have a matching SHA-256 entry in the source manifest. A missing or changed manifest entry stops normalization. Do not modify the raw files or hashes to bypass the check.
+
+Independent normalization workers can write separate theme outputs. Before a model run, combine their feature lists under one unchanged run/site/context frame and validate the complete source set, including duplicate identities. The staged runner accepts one combined source JSON; it does not merge theme files automatically. Terrain acquisition can continue independently while these 2D sources are processed.
+
 Do not repeat the release ID on every object. Put it in Rhino document user text, the run-information annotation, the report, and the final response.
 
 Each source object must keep:

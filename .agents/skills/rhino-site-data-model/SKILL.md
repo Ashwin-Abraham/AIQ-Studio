@@ -10,7 +10,7 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 ## Essential rules
 
 - Use `AIQ Site::` as the generated root layer.
-- Always create and include the 2D source data. Put it at Z = 0. Hide its parent layer by default.
+- Always create and include the 2D source data at Z = 0. Show it during the 2D stage. Hide its parent layer when the 3D stage is complete.
 - Use Overture Maps as the default semantic source. Keep the exact Overture taxonomy and provenance as object metadata.
 - Use authoritative national or local data when it is better for the requested theme. Keep conflicting sources in separate branches. Do not silently merge them.
 - Use OSM only as a documented fallback or enrichment source.
@@ -28,20 +28,26 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 
 ## Workflow
 
+The following steps may run in parallel with sub-agents when they do not depend on each other, to reduce completion time.
+
 1. Resolve the site and target Rhino model. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
 2. Read [source and context rules](references/source-and-context.md). Select the source release and context.
 3. Read [Rhino structure](references/rhino-structure.md). Resolve units, coordinates, layers, and the existing-model policy.
 4. When 3D buildings are in scope, read [building placement](references/building-placement.md) before creating geometry.
-5. Acquire and process the data for one logical stage at a time. Use the scripts in `scripts/` when their input contract fits. Read [processed data contract](references/processed-data-contract.md) before adapting the build script. Proceed to step 6 as soon as the data for the current stage are ready.
-6. Prepare and validate the geometry for the current stage. Use RhinoCommon to edit the open target document in logical stages. Add objects in bounded batches. After each batch, update progress, redraw views, and check for cancellation. Complete this stage in Rhino before returning to step 5 for the next stage. Do not prepare all stages before adding geometry to Rhino.
-7. Read [validation and reporting](references/validation-and-reporting.md). Reopen the output, run the checks, and inspect plan and perspective views when Rhino control is available.
+5. Acquire independent source themes in parallel where useful. Give each worker separate outputs. Read the [processed data contract](references/processed-data-contract.md) and [staged workflow](references/staged-workflow.md). Process shared source geometry without terrain. Terrain downloads can run during 2D work.
+6. Use `scripts/run_site_model.py` to prepare geometry in parallel and apply ready batches with one writer. Use the live backend for visible edits in the open target document. Import, check, and save all 2D geometry before preparing 3D geometry. Resume 3D from the checked source data and saved checkpoint, with separate terrain or an explicit flat elevation.
+7. Read [validation and reporting](references/validation-and-reporting.md). Check each saved stage and record failures. Inspect a plan view for 2D and plan and perspective views for 3D when Rhino control is available.
 8. Deliver the model, source cache, processed data, manifest, report, and audit. State the Overture release in the final response.
 
 ## Reusable scripts
 
+The staged entry point replaces the combined workflow. Keep the old `build_rhino_site_model.py` only for existing project scripts that import it. Do not use it for new runs.
+
 - `scripts/download_overture.py`: download selected Overture feature types and write a source manifest.
 - `scripts/derive_context.py`: select a projected CRS and calculate context bounds from a site boundary.
-- `scripts/build_rhino_site_model.py`: build a `.3dm` from the processed data contract.
-- `scripts/validate_site_model.py`: audit a saved `.3dm` and write JSON results.
+- `scripts/process_overture.py`: convert cached source features to shared, local 2D source data.
+- `scripts/run_site_model.py`: run a 2D stage, a 3D stage, both stages in order, an audit, or legacy-data migration.
+- `scripts/site_model/`: shared contract checks, geometry preparation, one document writer, stage coordination, and audits.
+- `scripts/disable_backface_culling.py`: set the Rhino application display option when needed.
 
 Treat the scripts as maintained starting points. Adapt source-specific parsing outside `SKILL.md` when a site needs a different authoritative dataset.
