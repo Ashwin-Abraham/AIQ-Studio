@@ -41,29 +41,28 @@ Avoid hard-coded model paths in reusable Rhino editing code.
 
 ## Progressive editing
 
-Divide a large edit into logical stages and object batches. A typical sequence is:
+Apply changes to the open Rhino document in logical stages:
 
 1. Validate the prepared input.
-2. Create or update required document definitions, such as layers, materials, blocks, and annotation styles.
-3. Add or update simple reference geometry.
-4. Add or update primary geometry in batches.
-5. Apply object attributes and metadata.
-6. Run document-level validation.
-7. Save only when the agreed save policy requires it.
+2. Create or update layers, materials, and other required definitions.
+3. Add or update reference geometry.
+4. Add or update primary geometry.
+5. Validate the complete document.
+6. Save according to the agreed save policy.
 
-For each visible stage or batch:
+Within each stage, process objects in bounded batches. Apply attributes and metadata with each object.
 
-- Add or update a bounded set of objects.
-- Update the Rhino status-bar progress meter.
-- Redraw the document views.
-- Periodically zoom the active views to the extents of the geometry created in the recent batches.
-- Check for user cancellation.
+For each batch:
+
 - Confirm that the captured document is still the target.
+- Check for user cancellation.
+- Add or update the objects.
 - Record created, updated, skipped, and failed object counts.
+- Update the Rhino status bar and redraw the views.
 
-Select batch size from elapsed time and Rhino responsiveness. Do not require one fixed object count for all geometry types. Expensive meshes can need smaller batches than points or curves.
+Adjust batch size to keep Rhino responsive. Periodically zoom to the recently added geometry.
 
-Do not disable redraw for the complete operation when progressive display is required. Redraw at useful intervals instead of after every object.
+Validate each completed stage before you continue. Keep redraw available throughout the operation.
 
 ## Rhino interface responsiveness
 
