@@ -14,9 +14,13 @@ Independent source acquisition, terrain downloads, and geometry preparation can 
 
 Geometry preparation accepts 1 to 8 workers. For parallel preparation inside Rhino, set `--worker-python` to the managed external Python executable selected under [Python scripting guidance](../../../PYTHON-SCRIPTING-GUIDANCE.md). That environment must have the script dependencies. Do not use Rhino's host executable as a Python worker. Use `--partition-size` to bound the number of source features in each preparation job; it is separate from the writer's object `--batch-size`.
 
+The workflow checks the selected worker from inside the Rhino execution context before it opens a writer transaction. A path that exists for the host shell can still be unavailable to Rhino. The preflight must start the worker and import the geometry dependencies. If the preflight fails, do not create an undo record or change the document.
+
 ## Live document
 
 Use the default `live` backend inside Rhino Python. Before the run, create and open the target file if needed. Capture the open target and check its path, serial number, saved state, units, and frame as required by [Rhino document editing guidance](../../../RHINO-DOCUMENT-EDITING-GUIDANCE.md). The command does not replace this setup.
+
+The live writer must save the open target through `RhinoDoc.WriteFile` with suppressed input and document-path updates enabled. Rhino owns temporary-file handling, backup creation, locking, and unlocking for an open document. Do not write a temporary file and call `os.replace` over the open target. The file writer remains the only adapter that uses same-directory temporary replacement.
 
 The writer applies bounded batches on Rhino's main interface thread, updates progress, redraws, and checks cancellation. Set `--batch-size` to suit the document. Preparation can continue while the writer applies ready batches. A failed or cancelled stage must not leave its incomplete edits; completed saved stages remain available.
 

@@ -117,6 +117,34 @@ class LiveWriterTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "identity"):
             writer.pump()
 
+    def test_deleted_object_history_does_not_make_document_nonempty(self):
+        from System import Guid
+        self.assertTrue(self.doc.Objects.Delete(Guid(self.user_id), True))
+        self.doc.Modified = False
+        writer = self.new_writer()
+        self.assertTrue(writer.initialize_anchor)
+
+    def test_hidden_live_object_keeps_document_nonempty(self):
+        from System import Guid
+        self.assertTrue(self.doc.Objects.Hide(Guid(self.user_id), True))
+        self.doc.Modified = False
+        writer = self.new_writer()
+        self.assertFalse(writer.initialize_anchor)
+
+    def test_rollback_ignores_deleted_layer_history(self):
+        layer = Rhino.DocObjects.Layer()
+        layer.Name = "Deleted before workflow"
+        index = self.doc.Layers.Add(layer)
+        self.assertGreaterEqual(index, 0)
+        self.assertTrue(self.doc.Layers.Delete(index, True))
+        self.doc.Modified = False
+        writer = self.new_writer()
+        writer.begin("2d")
+        prepared = self.prepared()
+        writer.apply(prepared, list(prepared.Objects))
+        writer.rollback()
+        self.assertEqual([str(obj.Id) for obj in self.doc.Objects], [self.user_id])
+
     def test_manual_geometry_edit_is_replaced_even_with_old_content_hash(self):
         writer = self.new_writer()
         writer.begin("2d")
@@ -172,7 +200,9 @@ class LiveWriterTests(unittest.TestCase):
                               "sources": [], "parts": [polygon]}]}
         source = Path(self.folder.name) / "sources.json"
         atomic_json(source, data)
-        python = Path(os.environ["LOCALAPPDATA"]) / "AIQ Studio/runtimes/python/py312-geospatial-system-v1/Scripts/python.exe"
+        configured = os.environ.get("SITE_MODEL_WORKER_PYTHON")
+        python = (Path(configured) if configured else
+                  Path(os.environ["LOCALAPPDATA"]) / "AIQ Studio/runtimes/python/py312-geospatial-system-v1/Scripts/python.exe")
         if not python.exists():
             # Use an existing interpreter with isolated test dependencies.
             python = Path.home() / "AppData/Local/Programs/Python/Python312/python.exe"
@@ -193,6 +223,12 @@ class LiveWriterTests(unittest.TestCase):
         saved = self.r3d.File3dm.Read(str(self.path))
         self.assertTrue(plan_ids <= {str(obj.Attributes.Id) for obj in saved.Objects})
         self.assertEqual(sum(obj.Attributes.GetUserString("geometry_role") == "building_volume" for obj in saved.Objects), 1)
+        result = run(Path(self.folder.name), source, self.path, stage="2d", backend="live",
+                     workers=2, worker_python=python, writer_factory=writer_factory, batch_size=3)
+        self.assertTrue(result["stages"][0]["passed"], result)
+        saved = self.r3d.File3dm.Read(str(self.path))
+        self.assertTrue(plan_ids <= {str(obj.Attributes.Id) for obj in saved.Objects})
+        self.assertEqual(sum(obj.Attributes.GetUserString("geometry_role") == "building_volume" for obj in saved.Objects), 0)
 
 
 if __name__ == "__main__":

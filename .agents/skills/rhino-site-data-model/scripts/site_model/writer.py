@@ -21,6 +21,18 @@ def owned(attrs):
     return attrs.GetUserString("site_owner") == OWNER
 
 
+def active_objects(doc, Rhino):
+    """Return live normal, locked, hidden, and reference objects."""
+    settings = Rhino.DocObjects.ObjectEnumeratorSettings()
+    settings.IncludeLights = True
+    settings.IncludeGrips = False
+    settings.NormalObjects = True
+    settings.LockedObjects = True
+    settings.HiddenObjects = True
+    settings.ReferenceObjects = True
+    return list(doc.Objects.GetObjectList(settings))
+
+
 def check_frame(model_units, strings, data, has_objects):
     if not has_objects:
         return
@@ -181,8 +193,9 @@ class RhinoWriter:
         if self.doc.Modified:
             raise ValueError("Save or resolve changes in the target before the live run")
         self.serial = self.doc.RuntimeSerialNumber
-        self.initialize_anchor = self.doc.Objects.Count == 0
-        check_frame(self.doc.ModelUnitSystem, lambda k: self.doc.Strings.GetValue(k), sources, self.doc.Objects.Count > 0)
+        objects = active_objects(self.doc, Rhino)
+        self.initialize_anchor = not objects
+        check_frame(self.doc.ModelUnitSystem, lambda k: self.doc.Strings.GetValue(k), sources, bool(objects))
         self.cancel = cancel or (lambda: False)
         self.progress = progress or (lambda event: None)
         self.escaped = False
@@ -205,13 +218,15 @@ class RhinoWriter:
         self.stage, self.seen, self.journal = stage, set(), []
         self.counts = dict(created=0, updated=0, skipped=0, deleted=0)
         self.new_layers = []
-        self.layer_state = [(l.Id, l.IsVisible, l.ModelIsVisible, l.GetPersistentVisibility(), l.ModelPersistentVisibility) for l in self.doc.Layers]
+        self.layer_state = [(l.Id, l.IsVisible, l.ModelIsVisible, l.GetPersistentVisibility(), l.ModelPersistentVisibility)
+                            for l in self.doc.Layers if l is not None and not l.IsDeleted]
         self.old_strings = [(self.doc.Strings.GetKey(i), self.doc.Strings.GetValue(i)) for i in range(self.doc.Strings.Count)]
         self.old_units = self.doc.ModelUnitSystem
         self.old_anchor = self.doc.EarthAnchorPoint
         self.old_backfaces = self.doc.RenderSettings.RenderBackfaces
-        self.existing = {o.Attributes.GetUserString("site_key"): o for o in self.doc.Objects if owned(o.Attributes)}
-        if len(self.existing) != sum(owned(o.Attributes) for o in self.doc.Objects):
+        objects = active_objects(self.doc, self.Rhino)
+        self.existing = {o.Attributes.GetUserString("site_key"): o for o in objects if owned(o.Attributes)}
+        if len(self.existing) != sum(owned(o.Attributes) for o in objects):
             raise ValueError("Target has duplicate generated keys")
         self.undo = 0
         if not self.doc.UndoRecordingIsActive:
@@ -239,7 +254,7 @@ class RhinoWriter:
         if native is None:
             raise RuntimeError("Cannot read prepared Rhino batch")
         try:
-            layer_map = {l.FullPath: l.Index for l in self.doc.Layers}
+            layer_map = {l.FullPath: l.Index for l in self.doc.Layers if l is not None and not l.IsDeleted}
             for layer in native.AllLayers:
                 if layer.FullPath in layer_map:
                     continue
@@ -311,7 +326,7 @@ class RhinoWriter:
 
     def finish(self):
         self.pump()
-        for obj in list(self.doc.Objects):
+        for obj in active_objects(self.doc, self.Rhino):
             attrs = obj.Attributes
             if owned(attrs) and ((attrs.GetUserString("site_stage") == self.stage and attrs.GetUserString("site_key") not in self.seen) or
                                  (self.stage == "2d" and attrs.GetUserString("site_stage") == "3d")):
@@ -335,20 +350,22 @@ class RhinoWriter:
             raise ValueError("Target file changed during the live run")
         options = self.Rhino.FileIO.FileWriteOptions()
         options.SuppressDialogBoxes = True
-        options.UpdateDocumentPath = False
-        fd, name = tempfile.mkstemp(dir=self.path.parent, suffix=".3dm")
-        os.close(fd)
-        try:
-            if not self.doc.Write3dmFile(name, options) or r3d.File3dm.Read(name) is None:
-                raise RuntimeError("Saved stage cannot be read")
-            os.replace(name, self.path)
-        finally:
-            if os.path.exists(name):
-                os.unlink(name)
-        self.doc.Modified = False
-        self.initial_hash = file_sha256(self.path)
+        options.SuppressAllInput = True
+        options.UpdateDocumentPath = True
+        options.CreateBackupFiles = True
+        if not self.doc.WriteFile(str(self.path), options):
+            raise RuntimeError("Rhino could not save the active target")
+        # WriteFile is the commit point. Do not roll the live document back
+        # after Rhino reports a successful save, even if verification fails.
         self._end_undo()
         self.transaction_open = False
+        if Path(self.doc.Path or "").resolve() != self.path:
+            raise RuntimeError("Rhino changed the document path during save")
+        if self.doc.Modified:
+            raise RuntimeError("Rhino saved the target but left the document modified")
+        if r3d.File3dm.Read(str(self.path)) is None:
+            raise RuntimeError("Saved stage cannot be read")
+        self.initial_hash = file_sha256(self.path)
 
     def _end_undo(self):
         if getattr(self, "undo", 0):
@@ -365,9 +382,13 @@ class RhinoWriter:
                 else:
                     self.doc.Objects.Add(*payload)
             for identifier in reversed(self.new_layers):
-                self.doc.Layers.Delete(self.doc.Layers.FindId(identifier).Index, True)
+                layer = self.doc.Layers.FindId(identifier)
+                if layer is not None and not layer.IsDeleted:
+                    self.doc.Layers.Delete(layer.Index, True)
             for identifier, visible, model_visible, persistent, model_persistent in self.layer_state:
                 layer = self.doc.Layers.FindId(identifier)
+                if layer is None or layer.IsDeleted:
+                    continue
                 layer.IsVisible, layer.ModelIsVisible = visible, model_visible
                 layer.SetPersistentVisibility(persistent)
                 layer.ModelPersistentVisibility = model_persistent
