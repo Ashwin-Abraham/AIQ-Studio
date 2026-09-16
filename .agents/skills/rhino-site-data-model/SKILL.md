@@ -22,6 +22,7 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 
 ## Project guidance
 
+- Read [Rhino document editing guidance](../../RHINO-DOCUMENT-EDITING-GUIDANCE.md) before you select an editing method or change a Rhino document. Follow its rules for progressive edits, document identity, progress display, cancellation, undo, and saving.
 - Read [Python scripting guidance](../../PYTHON-SCRIPTING-GUIDANCE.md) before you create or adapt Python scripts, manage dependencies, or select a runtime environment.
 - Read [project folder organisation](../../PROJECT-FOLDER-ORGANISATION.md) before you create project folders or place models, source data, processed data, reports, scripts, or exports.
 
@@ -32,7 +33,7 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 3. Read [Rhino structure](references/rhino-structure.md). Resolve units, coordinates, layers, and the existing-model policy.
 4. When 3D buildings are in scope, read [building placement](references/building-placement.md) before creating geometry.
 5. Acquire and process the data. Use the scripts in `scripts/` when their input contract fits. Read [processed data contract](references/processed-data-contract.md) before adapting the build script.
-6. Build the Rhino model. Preserve exact source IDs, properties, versions, and source records on objects.
+6. Prepare and validate the geometry. Use RhinoCommon to edit the open target document in logical stages. Add objects in bounded batches. After each batch, update progress, redraw views, and check for cancellation.
 7. Read [validation and reporting](references/validation-and-reporting.md). Reopen the output, run the checks, and inspect plan and perspective views when Rhino control is available.
 8. Deliver the model, source cache, processed data, manifest, report, and audit. State the Overture release in the final response.
 
