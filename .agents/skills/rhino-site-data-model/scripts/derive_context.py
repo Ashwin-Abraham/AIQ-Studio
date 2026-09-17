@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 from pyproj import CRS, Transformer
@@ -10,6 +11,9 @@ from pyproj.aoi import AreaOfInterest
 from pyproj.database import query_utm_crs_info
 from shapely.geometry import box, shape
 from shapely.ops import transform
+
+
+DEFAULT_CONTEXT_MARGIN_METRES = 100.0
 
 
 def read_geometry(path):
@@ -37,11 +41,34 @@ def projected_crs(geometry):
     return CRS.from_epsg(3857)
 
 
+def estimated_context(site_projected, margin_metres=DEFAULT_CONTEXT_MARGIN_METRES):
+    """Return the site envelope with a small projected safety margin."""
+    if (
+        not isinstance(margin_metres, (int, float))
+        or not math.isfinite(margin_metres)
+        or margin_metres <= 0
+    ):
+        raise ValueError("Context margin must be a positive finite number of metres")
+    min_x, min_y, max_x, max_y = site_projected.bounds
+    return box(
+        min_x - margin_metres,
+        min_y - margin_metres,
+        max_x + margin_metres,
+        max_y + margin_metres,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--site", required=True, help="GeoJSON site polygon in WGS84")
     parser.add_argument("--output", required=True)
     parser.add_argument("--viewport", help="Reliable west,south,east,north bounds in WGS84")
+    parser.add_argument(
+        "--context-margin-metres",
+        type=float,
+        default=DEFAULT_CONTEXT_MARGIN_METRES,
+        help="Safety margin around the site envelope when --viewport is omitted (default: 100)",
+    )
     args = parser.parse_args()
 
     site_wgs84 = read_geometry(args.site)
@@ -57,12 +84,11 @@ def main():
             raise ValueError("--viewport must be west,south,east,north")
         context_projected = transform(forward.transform, box(*values))
         method = "reliable map viewport"
+        context_margin_metres = None
     else:
-        min_x, min_y, max_x, max_y = site_projected.bounds
-        longest_edge = max(max_x - min_x, max_y - min_y)
-        width = max(300.0, 5.0 * longest_edge)
-        context_projected = box(centre.x - width / 2, centre.y - width / 2, centre.x + width / 2, centre.y + width / 2)
-        method = "max(300 m, 5 x site longest edge) total width"
+        context_projected = estimated_context(site_projected, args.context_margin_metres)
+        context_margin_metres = args.context_margin_metres
+        method = f"site envelope plus {context_margin_metres:g} m safety margin"
 
     def localize(x, y, z=None):
         return x - centre.x, y - centre.y
@@ -78,6 +104,7 @@ def main():
         "context_bounds_local": list(context_local.bounds),
         "context_bounds_wgs84": list(context_wgs84.bounds),
         "context_selection_method": method,
+        "context_margin_metres": context_margin_metres,
         "site_longest_edge_m": max(site_projected.bounds[2] - site_projected.bounds[0], site_projected.bounds[3] - site_projected.bounds[1]),
     }
     Path(args.output).write_text(json.dumps(result, indent=2), encoding="utf-8")
