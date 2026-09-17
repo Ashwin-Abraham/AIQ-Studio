@@ -14,7 +14,8 @@ Check and save the complete 2D stage before 3D preparation. A 2D audit marks 3D 
 - The site and context boundaries exist.
 - Expected themes and non-empty category layers exist.
 - Source counts reconcile with processed counts and created-object counts.
-- All source-derived objects have a source ID, version, exact properties, and source records.
+- All 2D source objects have a source type, ID, version, exact properties, source records, and generic classification.
+- All derived 3D objects have a source type, ID, and version that resolve to retained 2D source metadata. They do not duplicate exact source properties, source records, or generic classification.
 - All geometry is valid.
 - Polygon holes and multipolygon parts are accounted for.
 - In 3D, all building masses extend in world `+Z`.

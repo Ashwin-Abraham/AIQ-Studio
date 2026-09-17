@@ -18,7 +18,7 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 - Do not infer water levels or unresolved bridge, tunnel, or underground positions.
 - Generate every building volume along world `+Z`. Never let curve direction control the volume direction.
 - Record validation failures. Do not stop model generation only because a validation check fails.
-- Do not overwrite or modify an existing model unless the user has authorized that target and its state is safe.
+- Use sub agents where possible to speed up the workflow. Do not let them write to the same Rhino document at the same time.
 
 ## Project guidance
 
@@ -28,16 +28,18 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 
 ## Workflow
 
-The following steps may run in parallel with sub-agents when they do not depend on each other, to reduce completion time.
+The following steps must run in parallel with sub-agents when they do not depend on each other, to reduce completion time.
 
-1. Resolve the site and target Rhino model. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
-2. Read [source and context rules](references/source-and-context.md). Select the source release and context.
-3. Read [Rhino structure](references/rhino-structure.md). Resolve units, coordinates, layers, and the existing-model policy.
-4. When 3D buildings are in scope, read [building placement](references/building-placement.md) before creating geometry.
-5. Acquire independent source themes in parallel where useful. Give each worker separate outputs. Read the [processed data contract](references/processed-data-contract.md) and [staged workflow](references/staged-workflow.md). Process shared source geometry without terrain. Terrain downloads can run during 2D work.
-6. Use `scripts/run_site_model.py` to prepare geometry in parallel and apply ready batches with one writer. Use the live backend for visible edits in the open target document. Import, check, and save all 2D geometry before preparing 3D geometry. Resume 3D from the checked source data and saved checkpoint, with separate terrain or an explicit flat elevation.
-7. Read [validation and reporting](references/validation-and-reporting.md). Check each saved stage and record failures. Inspect a plan view for 2D and plan and perspective views for 3D when Rhino control is available.
-8. Deliver the model, source cache, processed data, manifest, report, and audit. State the Overture release in the final response.
+1. Resolve the target Rhino model. Create a model if there is no existing model at the specified location.
+2. Resolve the site boundary. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
+3. Read [source and context rules](references/source-and-context.md). Select the source release and context.
+4. Read [Rhino structure](references/rhino-structure.md). Resolve units, coordinates, layers, and the existing-model policy.
+5. Find the best available source for terrain and ask the user if a 3D model with terrain and projected objects is required (alongside a flat 2D model).
+6. When 3D buildings are in scope, read [building placement](references/building-placement.md) before creating geometry.
+7. Acquire independent source themes in parallel where useful. Give each worker separate outputs. Read the [processed data contract](references/processed-data-contract.md) and [staged workflow](references/staged-workflow.md). Process shared source geometry without terrain. Terrain downloads can run during 2D work.
+8. Use `scripts/run_site_model.py` to prepare geometry in parallel and apply ready batches with one writer. Use the live backend for visible edits in the open target document. Import, check, and save all 2D geometry before preparing 3D geometry. Resume 3D from the checked source data and saved checkpoint, with separate terrain or an explicit flat elevation.
+9. Read [validation and reporting](references/validation-and-reporting.md). Check each saved stage and record failures. Inspect a plan view for 2D and plan and perspective views for 3D when Rhino control is available.
+10. Deliver the model, source cache, processed data, manifest, report, and audit. State the Overture release in the final response.
 
 ## Reusable scripts
 

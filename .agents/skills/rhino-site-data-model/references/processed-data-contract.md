@@ -42,6 +42,10 @@ Context should retain `selection_method`, `bounds_wgs84`, and `bounds_local` for
 
 Each feature needs a nonempty string ID and type, at least one category name, properties, source records, and geometry parts. The pair `(feature_type, id)` must be unique. Category names cannot contain the Rhino layer separator `::`. Retain exact source properties, including height fields; do not replace them with generic categories.
 
+Do not put Overture transport connector features in processed source data. The contract rejects the `connector` feature type. Transport segment source properties can retain their exact connector references as source metadata, but the workflow does not download, normalize, or create connector point objects.
+
+The processed source file remains the complete source-of-truth record. In Rhino, put the complete `source_properties_json`, `source_records_json`, and generic classification only on 2D source objects. A derived 3D object keeps `source_feature_type`, `source_feature_id`, `source_feature_version`, and its derived or placement fields. Resolve its complete source metadata by matching that three-field reference to a retained 2D source object. Do not copy the complete source JSON onto derived objects.
+
 Parts use these formats:
 
 - `Point`: `points` contains exactly one `[x, y, 0]` coordinate.

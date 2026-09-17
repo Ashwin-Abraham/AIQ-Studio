@@ -26,7 +26,6 @@ AIQ Site::
       Roads::
       Railway::
       Water Routes::
-      Connectors::
     Water::
     Land Use::
     Places::
@@ -57,7 +56,7 @@ The `2D` parent is visible during a 2D run. Hide it when the 3D stage is complet
 
 Generated objects use `site_owner = rhino-site-data-model`, `site_stage`, and a stable `site_key`. Use these fields to replace stage outputs. Preserve user objects, including objects on generated layers. Do not infer ownership from a layer name. The [staged workflow](staged-workflow.md) defines replacement and checkpoint rules.
 
-Use generic classes for layer names. Keep the exact source class, subtype, taxonomy, and other fields as metadata.
+Use generic classes for layer names. Keep the exact source class, subtype, taxonomy, and other fields on the retained 2D source objects. Derived 3D objects keep only their source type, ID, version, and derived or placement fields; resolve their complete metadata through the matching 2D source object.
 
 ## Geometry rules
 

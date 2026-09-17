@@ -70,6 +70,12 @@ class ContractTests(unittest.TestCase):
         data["features"][1]["feature_type"] = "building_part"
         validate_sources(data)
 
+    def test_rejects_transport_connector_features(self):
+        data = sources()
+        data["features"][0]["feature_type"] = "connector"
+        with self.assertRaisesRegex(ValueError, "Unsupported source feature type: connector"):
+            validate_sources(data)
+
     def test_rejects_missing_metadata_and_empty_category(self):
         data = sources()
         del data["run"]["projected_crs"]

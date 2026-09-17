@@ -15,14 +15,7 @@ If there is no exact mapped feature, show or describe the candidate before model
 
 ## Context
 
-Use the map viewport when its geographic bounds are directly available and reliable.
-
-Otherwise:
-
-- Find the site’s longest edge or longest bounding-box dimension.
-- Set the minimum total context width to `max(300 m, 5 × site longest edge)`.
-- Centre the context on the site unless the user gives a different focus.
-
+Use the map viewport when its geographic bounds are directly available and reliable. Otherwise, estimate the context boundary and add a small margin of safety.
 Clip working model geometry to the context boundary. Keep the complete downloaded source files unchanged in the cache. Record both the download bounds and model context bounds.
 
 ## Semantic sources
@@ -30,7 +23,7 @@ Clip working model geometry to the context boundary. Keep the complete downloade
 Use Overture Maps by default for:
 
 - buildings and building parts;
-- transport segments and connectors;
+- transport segments;
 - water;
 - land and land use;
 - places.

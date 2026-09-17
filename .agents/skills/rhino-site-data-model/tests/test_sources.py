@@ -5,8 +5,8 @@ import tempfile
 import threading
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from download_overture import download_sources
-from process_overture import normalize_features, process_sources
+from download_overture import DEFAULT_TYPES, download_sources, validate_types
+from process_overture import FEATURE_TYPES, _clip_to_context, normalize_features, process_sources
 from shapely.geometry import box, mapping, Polygon, MultiPolygon
 
 
@@ -58,8 +58,26 @@ class AcquisitionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             with self.assertRaises(ValueError):download_sources([0,0,1,1],temp,'2026-08-19.0',['water'],runner=runner)
             self.assertFalse((Path(temp)/'source-manifest.json').exists())
+    def test_connector_is_not_a_download_or_normalization_type(self):
+        self.assertNotIn('connector',DEFAULT_TYPES)
+        self.assertNotIn('connector',FEATURE_TYPES)
+        with self.assertRaisesRegex(ValueError,'Unsupported feature type'):
+            validate_types(['connector'])
 
 class NormalizationTests(unittest.TestCase):
+    def test_contained_geometry_uses_bounds_fast_path(self):
+        context=box(0,0,10,10);geometry=box(2,2,4,4)
+        clipped=_clip_to_context(geometry,context,context.bounds,True)
+        self.assertIs(clipped,geometry)
+    def test_crossing_geometry_still_uses_exact_intersection(self):
+        context=box(0,0,10,10);geometry=box(8,8,12,12)
+        clipped=_clip_to_context(geometry,context,context.bounds,True)
+        self.assertTrue(clipped.equals(box(8,8,10,10)))
+        self.assertIsNot(clipped,geometry)
+    def test_irregular_context_does_not_use_containment_fast_path(self):
+        context=box(0,0,10,10).difference(box(4,4,6,6));geometry=box(4.5,4.5,5.5,5.5)
+        clipped=_clip_to_context(geometry,context,context.bounds,False)
+        self.assertTrue(clipped.is_empty)
     def test_repair_retains_collapsed_line_and_polygon(self):
         polygon=Polygon([(0,0),(2,0),(2,2),(1,2),(1,3),(1,2),(0,2),(0,0)])
         records=normalize_features({'water':collection(feature(polygon))},lambda x,y,z=None:(x,y),box(-1,-1,4,4))

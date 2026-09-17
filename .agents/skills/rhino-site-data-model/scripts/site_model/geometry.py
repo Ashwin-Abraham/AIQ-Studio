@@ -11,6 +11,8 @@ from shapely.geometry import Point, Polygon
 from shapely.geometry.polygon import orient
 from shapely import constrained_delaunay_triangles
 
+from .contract import METADATA_CONTRACT
+
 def triangulate(polygon):
     return list(constrained_delaunay_triangles(polygon).geoms)
 
@@ -313,6 +315,7 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
         value = run.get(key, 'not set')
         model.Strings['site.' + target] = json.dumps(value) if isinstance(value, (list, dict)) else str(value)
     model.Strings['site.stage'] = stage
+    model.Strings['site.metadata_contract'] = METADATA_CONTRACT
     model.Strings['site.height_rules'] = '3.5 m floor; 3-floor occupied fallback; 1-floor small-building and building-part fallback'
     model.Strings['site.render_backfaces'] = 'true'
     earth = model.Settings.EarthAnchorPoint
@@ -344,7 +347,9 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
         attrs.ColorSource = r3d.ObjectColorSource.ColorFromLayer
         values = {'site_owner':'rhino-site-data-model', 'site_stage':stage, 'geometry_role':role, 'clipped_part_index':str(part)}
         if record:
-            values.update(source_feature_id=str(record.get('id')), source_feature_type=str(record.get('feature_type')), source_feature_version=str(record.get('version')), generic_category='::'.join(record.get('category_path') or []), source_properties_json=json.dumps(record.get('properties') or {}, sort_keys=True, ensure_ascii=False), source_records_json=json.dumps(record.get('sources') or (record.get('properties') or {}).get('sources') or [], sort_keys=True, ensure_ascii=False))
+            values.update(source_feature_id=str(record.get('id')), source_feature_type=str(record.get('feature_type')), source_feature_version=str(record.get('version')))
+            if stage == '2d':
+                values.update(generic_category='::'.join(record.get('category_path') or []), source_properties_json=json.dumps(record.get('properties') or {}, sort_keys=True, ensure_ascii=False), source_records_json=json.dumps(record.get('sources') or (record.get('properties') or {}).get('sources') or [], sort_keys=True, ensure_ascii=False))
         if hole is not None:
             values['hole_index'] = str(hole)
         values.update(extra or {})
