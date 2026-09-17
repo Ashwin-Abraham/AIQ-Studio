@@ -15,7 +15,7 @@ If there is no exact mapped feature, show or describe the candidate before model
 
 ## Context
 
-Use the map viewport when its geographic bounds are directly available and reliable. Otherwise, estimate the context boundary and add a small margin of safety.
+Use the map viewport when its geographic bounds are directly available and reliable. Otherwise, use the site envelope with a 100 m safety margin. `derive_context.py --context-margin-metres` can set a different explicit margin for the project.
 Clip working model geometry to the context boundary. Keep the complete downloaded source files unchanged in the cache. Record both the download bounds and model context bounds.
 
 ## Semantic sources
