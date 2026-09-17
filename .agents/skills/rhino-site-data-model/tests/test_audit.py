@@ -9,16 +9,21 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import rhino3dm as r3d
 from site_model.audit import DOCUMENT_KEYS, OWNER, audit_file, audit_model
+from site_model.contract import METADATA_CONTRACT
 
 
-def attributes(key, role, stage="2d", source=False):
+def attributes(key, role, stage="2d", source=False, full_source=None, source_id="a"):
     attrs = r3d.ObjectAttributes()
     for name, value in {"site_owner": OWNER, "site_key": key, "site_stage": stage, "geometry_role": role}.items():
         attrs.SetUserString(name, value)
     if source:
-        for name, value in {"source_feature_id": "a", "source_feature_type": "building",
-                            "source_feature_version": "1", "source_properties_json": "{}",
-                            "source_records_json": "[]"}.items():
+        values = {"source_feature_id": source_id, "source_feature_type": "building",
+                  "source_feature_version": "1"}
+        include_details = full_source if full_source is not None else stage == "2d"
+        if include_details:
+            values.update(generic_category="Buildings", source_properties_json="{}",
+                          source_records_json="[]")
+        for name, value in values.items():
             attrs.SetUserString(name, value)
     return attrs
 
@@ -27,12 +32,13 @@ def model_2d():
     model = r3d.File3dm()
     model.Settings.ModelUnitSystem = r3d.UnitSystem.Meters
     for name in DOCUMENT_KEYS:
-        model.Strings[name] = "test"
+        model.Strings[name] = METADATA_CONTRACT if name == "site.metadata_contract" else "test"
     for name in ("site", "context"):
         curve = r3d.PolylineCurve([r3d.Point3d(0, 0, 0), r3d.Point3d(2, 0, 0),
                                    r3d.Point3d(2, 2, 0), r3d.Point3d(0, 0, 0)])
         model.Objects.AddCurve(curve, attributes(name, "source_plan_boundary"))
     model.Objects.AddTextDot("test", r3d.Point3d(0, 0, 0), attributes("annotation", "run_annotation"))
+    model.Objects.AddPoint(r3d.Point3d(0, 0, 0), attributes("source-metadata", "source_plan_point", source=True))
     return model
 
 
@@ -99,6 +105,16 @@ class AuditTests(unittest.TestCase):
         attrs.SetUserString("source_properties_json", "[]")
         model.Objects.AddPoint(r3d.Point3d(0, 0, 3), attrs)
         self.assertTrue({"source_plan_z", "source_metadata_json"} <= self.checks(audit_model(model, "3d")))
+
+    def test_3d_rejects_duplicated_details_and_unresolved_reference(self):
+        model = model_2d()
+        add_3d(model)
+        duplicated = attributes("derived-details", "terrain_draped_point", "3d", source=True, full_source=True)
+        model.Objects.AddPoint(r3d.Point3d(0, 0, 0), duplicated)
+        missing = attributes("derived-missing", "terrain_draped_point", "3d", source=True, source_id="missing")
+        model.Objects.AddPoint(r3d.Point3d(0, 0, 0), missing)
+        checks = self.checks(audit_model(model, "3d"))
+        self.assertTrue({"derived_metadata_duplication", "source_metadata_reference"} <= checks)
 
     def test_closed_mass_and_bad_top_elevation(self):
         for height, expected in ((10, True), (12, False)):

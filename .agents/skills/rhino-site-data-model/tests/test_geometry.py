@@ -1,4 +1,5 @@
 import copy
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -61,6 +62,21 @@ class GeometryTests(unittest.TestCase):
         model=prepare_stage(fixture(),'2d')
         copy=rhino3dm.File3dm.Decode(model.Encode())
         self.assertEqual(len(copy.Objects),len(model.Objects))
+    def test_full_source_metadata_is_only_on_2d_objects(self):
+        data=fixture();data['features'][0]['sources']=[{'dataset':'test'}]
+        plan=prepare_stage(data,'2d')
+        source=next(o for o in plan.Objects if o.Attributes.GetUserString('source_feature_id'))
+        self.assertEqual(json.loads(source.Attributes.GetUserString('source_properties_json')),{'height':12})
+        self.assertEqual(json.loads(source.Attributes.GetUserString('source_records_json')),[{'dataset':'test'}])
+        self.assertEqual(source.Attributes.GetUserString('generic_category'),'Buildings::Residential')
+        derived=prepare_stage(data,'3d',flat_elevation=0)
+        for obj in (o for o in derived.Objects if o.Attributes.GetUserString('source_feature_id')):
+            self.assertEqual(obj.Attributes.GetUserString('source_feature_type'),'building')
+            self.assertFalse(obj.Attributes.GetUserString('source_properties_json'))
+            self.assertFalse(obj.Attributes.GetUserString('source_records_json'))
+            self.assertFalse(obj.Attributes.GetUserString('generic_category'))
+        volume=next(o for o in derived.Objects if o.Attributes.GetUserString('geometry_role')=='building_volume')
+        self.assertEqual(volume.Attributes.GetUserString('height_method'),'explicit height')
 
     def test_2d_never_constructs_sampler(self):
         with patch('site_model.geometry.TerrainSampler',side_effect=AssertionError('terrain touched')), patch('site_model.geometry.height_rule',side_effect=AssertionError('3D heights touched')):

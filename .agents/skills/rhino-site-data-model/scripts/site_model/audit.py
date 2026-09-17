@@ -8,11 +8,14 @@ from pathlib import Path
 
 import rhino3dm as r3d
 
+from .contract import METADATA_CONTRACT
+
 OWNER = "rhino-site-data-model"
 DOCUMENT_KEYS = ("site.name", "site.source_release", "site.projected_crs",
-                 "site.origin_wgs84", "site.origin_projected", "site.vertical_datum")
-SOURCE_KEYS = ("source_feature_id", "source_feature_type", "source_feature_version",
-               "source_properties_json", "source_records_json")
+                 "site.origin_wgs84", "site.origin_projected", "site.vertical_datum",
+                 "site.metadata_contract")
+SOURCE_REFERENCE_KEYS = ("source_feature_id", "source_feature_type", "source_feature_version")
+SOURCE_DETAIL_KEYS = ("generic_category", "source_properties_json", "source_records_json")
 
 
 def audit_model(model, stage, visual_inspection="not-possible", visual_notes=""):
@@ -46,6 +49,8 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
     invalid_count = 0
     volumes = []
     sources = []
+    source_details = set()
+    derived_references = []
     for obj in owned:
         attrs, geometry = obj.Attributes, obj.Geometry
         object_id = str(attrs.Id)
@@ -72,17 +77,29 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
             if not all(math.isfinite(z) and abs(z) <= 1e-8 for z in (bounds.Min.Z, bounds.Max.Z)):
                 fail("source_plan_z", object_id=object_id)
         if role not in {"source_plan_boundary", "terrain_draped_boundary", "terrain_mesh", "run_annotation"}:
-            missing = [name for name in SOURCE_KEYS if not attrs.GetUserString(name)]
+            missing = [name for name in SOURCE_REFERENCE_KEYS if not attrs.GetUserString(name)]
             if missing:
                 fail("source_metadata", object_id=object_id, missing=missing)
-            for name, expected in (("source_properties_json", dict), ("source_records_json", list)):
-                value = attrs.GetUserString(name)
-                if value:
-                    try:
-                        if not isinstance(json.loads(value), expected):
-                            raise ValueError("Wrong JSON type")
-                    except (ValueError, TypeError):
-                        fail("source_metadata_json", object_id=object_id, field=name)
+            reference = tuple(attrs.GetUserString(name) for name in SOURCE_REFERENCE_KEYS)
+            if obj_stage == "2d":
+                missing_details = [name for name in SOURCE_DETAIL_KEYS if not attrs.GetUserString(name)]
+                if missing_details:
+                    fail("source_metadata", object_id=object_id, missing=missing_details)
+                else:
+                    source_details.add(reference)
+                for name, expected in (("source_properties_json", dict), ("source_records_json", list)):
+                    value = attrs.GetUserString(name)
+                    if value:
+                        try:
+                            if not isinstance(json.loads(value), expected):
+                                raise ValueError("Wrong JSON type")
+                        except (ValueError, TypeError):
+                            fail("source_metadata_json", object_id=object_id, field=name)
+            elif obj_stage == "3d":
+                duplicated = [name for name in SOURCE_DETAIL_KEYS if attrs.GetUserString(name)]
+                if duplicated:
+                    fail("derived_metadata_duplication", object_id=object_id, fields=duplicated)
+                derived_references.append((object_id, reference))
         if stage == "3d" and role == "building_volume":
             volumes.append(obj)
             closed = geometry.IsClosed if isinstance(geometry, r3d.Mesh) else getattr(geometry, "IsSolid", False)
@@ -108,11 +125,19 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
     duplicate_keys = sorted(key for key, count in keys.items() if count > 1)
     if duplicate_keys:
         fail("duplicate_keys", keys=duplicate_keys)
+    for object_id, reference in derived_references:
+        if all(reference) and reference not in source_details:
+            fail("source_metadata_reference", object_id=object_id,
+                 source_feature_type=reference[1], source_feature_id=reference[0],
+                 source_feature_version=reference[2])
     if model.Settings.ModelUnitSystem != r3d.UnitSystem.Meters:
         fail("model_units", value=str(model.Settings.ModelUnitSystem))
     missing_document = [key for key in DOCUMENT_KEYS if not model.Strings[key]]
     if missing_document:
         fail("document_metadata", missing=missing_document)
+    elif model.Strings["site.metadata_contract"] != METADATA_CONTRACT:
+        fail("document_metadata_contract", expected=METADATA_CONTRACT,
+             actual=model.Strings["site.metadata_contract"])
     if roles["source_plan_boundary"] < 2:
         fail("boundaries", message="Site and context source boundaries are required")
     if roles["run_annotation"] == 0:

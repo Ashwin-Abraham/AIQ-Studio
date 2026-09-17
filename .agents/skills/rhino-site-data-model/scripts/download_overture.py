@@ -15,7 +15,7 @@ import tempfile
 
 from site_model.contract import atomic_json, confined_path, file_sha256, load_json
 
-DEFAULT_TYPES = ['building', 'building_part', 'segment', 'connector', 'water', 'land', 'land_use', 'place']
+DEFAULT_TYPES = ['building', 'building_part', 'segment', 'water', 'land', 'land_use', 'place']
 file_hash = file_sha256
 
 

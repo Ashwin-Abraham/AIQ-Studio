@@ -13,6 +13,8 @@ import tempfile
 
 CHECKPOINT_SCHEMA = "rhino-site-model-checkpoint"
 CONTRACT_VERSION = 1
+METADATA_CONTRACT = "source-payload-2d-v1"
+EXCLUDED_FEATURE_TYPES = frozenset(("connector",))
 _RUN_TEXT = ("site_name", "generated_utc", "semantic_source", "source_release",
              "projected_crs", "vertical_datum", "source_manifest_path", "report_path")
 
@@ -121,6 +123,8 @@ def validate_sources(data):
             raise ValueError("Each feature must be an object")
         for name in ("id", "feature_type"):
             _text(feature.get(name), "feature." + name)
+        if feature["feature_type"] in EXCLUDED_FEATURE_TYPES:
+            raise ValueError("Unsupported source feature type: " + feature["feature_type"])
         identity = (feature["feature_type"], feature["id"])
         if identity in identities:
             raise ValueError("Duplicate source feature: " + repr(identity))

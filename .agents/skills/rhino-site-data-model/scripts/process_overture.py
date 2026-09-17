@@ -13,7 +13,7 @@ from shapely import make_valid
 from site_model.contract import atomic_json, file_sha256, load_json, validate_sources
 from download_overture import validate_types
 
-FEATURE_TYPES = ["building", "building_part", "segment", "connector", "water", "land", "land_use", "place"]
+FEATURE_TYPES = ["building", "building_part", "segment", "water", "land", "land_use", "place"]
 
 
 def read_geojson_geometry(path):
@@ -49,8 +49,6 @@ def category(feature_type, properties):
         if subtype == "rail":
             return ["Transport", "Railway", clean(class_name)]
         return ["Transport", "Water Routes", clean(class_name or subtype)]
-    if feature_type == "connector":
-        return ["Transport", "Connectors"]
     if feature_type == "water":
         return ["Water", clean(subtype), clean(class_name)]
     if feature_type == "land_use":
@@ -95,9 +93,24 @@ def leaf_geometries(geometry):
         yield geometry
 
 
+def _clip_to_context(geometry, context_geometry, context_bounds, context_is_box):
+    """Use bounds to avoid an exact intersection when the result is certain."""
+    min_x, min_y, max_x, max_y = geometry.bounds
+    context_min_x, context_min_y, context_max_x, context_max_y = context_bounds
+    if max_x < context_min_x or max_y < context_min_y or min_x > context_max_x or min_y > context_max_y:
+        return GeometryCollection()
+    if (context_is_box and min_x >= context_min_x and min_y >= context_min_y
+            and max_x <= context_max_x and max_y <= context_max_y):
+        return geometry
+    return geometry.intersection(context_geometry)
+
+
 def normalize_features(collections, to_local, context_geometry):
     """Normalize selected cached collections without terrain or file writes."""
     records = []
+    context_bounds = context_geometry.bounds
+    context_is_box = (context_geometry.geom_type == 'Polygon'
+                      and context_geometry.equals(box(*context_bounds)))
     for feature_type, collection in collections.items():
         validate_types([feature_type])
         if collection.get('type') != 'FeatureCollection' or not isinstance(collection.get('features'),list):
@@ -110,7 +123,7 @@ def normalize_features(collections, to_local, context_geometry):
             repaired = not source_geometry.is_valid
             for source_part_index, source_part in enumerate(leaf_geometries(source_geometry)):
                 valid = source_part if source_part.is_valid else make_valid(source_part)
-                clipped = valid.intersection(context_geometry)
+                clipped = _clip_to_context(valid, context_geometry, context_bounds, context_is_box)
                 for part in flatten(clipped):
                     part['source_part_index'] = source_part_index
                     part['clipped_part_index'] = len(parts)
