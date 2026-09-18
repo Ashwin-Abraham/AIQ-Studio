@@ -84,18 +84,26 @@ class FileWriter:
         self.pump()
         for layer in prepared.Layers:
             if layer.FullPath in self.layer_map:
-                continue
-            item = r3d.Layer()
-            item.Name, item.Color, item.Visible = layer.Name, layer.Color, layer.Visible
-            parent = layer.FullPath.rpartition("::")[0]
-            if parent:
-                item.ParentLayerId = self.model.Layers.FindIndex(self.layer_map[parent]).Id
-            self.layer_map[layer.FullPath] = self.model.Layers.Add(item)
+                item = self.model.Layers.FindIndex(self.layer_map[layer.FullPath])
+                item.Color, item.PlotColor = layer.Color, layer.PlotColor
+                item.PlotWeight, item.Visible = layer.PlotWeight, layer.Visible
+            else:
+                item = r3d.Layer()
+                item.Name, item.Color, item.Visible = layer.Name, layer.Color, layer.Visible
+                item.PlotColor, item.PlotWeight = layer.PlotColor, layer.PlotWeight
+                parent = layer.FullPath.rpartition("::")[0]
+                if parent:
+                    item.ParentLayerId = self.model.Layers.FindIndex(self.layer_map[parent]).Id
+                self.layer_map[layer.FullPath] = self.model.Layers.Add(item)
         for obj in objects:
             attrs = r3d.ObjectAttributes()
             attrs.LayerIndex = obj.Attributes.LayerIndex
             attrs.Name = obj.Attributes.Name
             attrs.ColorSource = obj.Attributes.ColorSource
+            attrs.PlotColorSource = obj.Attributes.PlotColorSource
+            attrs.PlotWeightSource = obj.Attributes.PlotWeightSource
+            attrs.LinetypeSource = obj.Attributes.LinetypeSource
+            attrs.DisplayOrder = obj.Attributes.DisplayOrder
             for name, value in obj.Attributes.GetUserStrings():
                 attrs.SetUserString(name, value)
             key = attrs.GetUserString("site_key")
@@ -218,7 +226,8 @@ class RhinoWriter:
         self.stage, self.seen, self.journal = stage, set(), []
         self.counts = dict(created=0, updated=0, skipped=0, deleted=0)
         self.new_layers = []
-        self.layer_state = [(l.Id, l.IsVisible, l.ModelIsVisible, l.GetPersistentVisibility(), l.ModelPersistentVisibility)
+        self.layer_state = [(l.Id, l.IsVisible, l.ModelIsVisible, l.GetPersistentVisibility(), l.ModelPersistentVisibility,
+                             l.Color, l.PlotColor, l.PlotWeight, l.LinetypeIndex)
                             for l in self.doc.Layers if l is not None and not l.IsDeleted]
         self.old_strings = [(self.doc.Strings.GetKey(i), self.doc.Strings.GetValue(i)) for i in range(self.doc.Strings.Count)]
         self.old_units = self.doc.ModelUnitSystem
@@ -257,17 +266,23 @@ class RhinoWriter:
             layer_map = {l.FullPath: l.Index for l in self.doc.Layers if l is not None and not l.IsDeleted}
             for layer in native.AllLayers:
                 if layer.FullPath in layer_map:
-                    continue
-                new = self.Rhino.DocObjects.Layer()
-                new.Name, new.Color, new.IsVisible = layer.Name, layer.Color, layer.IsVisible
-                parent = layer.FullPath.rpartition("::")[0]
-                if parent:
-                    new.ParentLayerId = self.doc.Layers[layer_map[parent]].Id
-                index = self.doc.Layers.Add(new)
-                if index < 0:
-                    raise RuntimeError("Could not add site layer")
-                self.new_layers.append(self.doc.Layers[index].Id)
-                layer_map[layer.FullPath] = index
+                    current = self.doc.Layers[layer_map[layer.FullPath]]
+                    current.Color, current.PlotColor = layer.Color, layer.PlotColor
+                    current.PlotWeight, current.IsVisible = layer.PlotWeight, layer.IsVisible
+                    if not current.CommitChanges():
+                        raise RuntimeError("Could not update site layer style")
+                else:
+                    new = self.Rhino.DocObjects.Layer()
+                    new.Name, new.Color, new.IsVisible = layer.Name, layer.Color, layer.IsVisible
+                    new.PlotColor, new.PlotWeight = layer.PlotColor, layer.PlotWeight
+                    parent = layer.FullPath.rpartition("::")[0]
+                    if parent:
+                        new.ParentLayerId = self.doc.Layers[layer_map[parent]].Id
+                    index = self.doc.Layers.Add(new)
+                    if index < 0:
+                        raise RuntimeError("Could not add site layer")
+                    self.new_layers.append(self.doc.Layers[index].Id)
+                    layer_map[layer.FullPath] = index
             for obj in native.Objects:
                 attrs = obj.Attributes.Duplicate()
                 key = attrs.GetUserString("site_key")
@@ -385,13 +400,15 @@ class RhinoWriter:
                 layer = self.doc.Layers.FindId(identifier)
                 if layer is not None and not layer.IsDeleted:
                     self.doc.Layers.Delete(layer.Index, True)
-            for identifier, visible, model_visible, persistent, model_persistent in self.layer_state:
+            for identifier, visible, model_visible, persistent, model_persistent, color, plot_color, plot_weight, linetype_index in self.layer_state:
                 layer = self.doc.Layers.FindId(identifier)
                 if layer is None or layer.IsDeleted:
                     continue
                 layer.IsVisible, layer.ModelIsVisible = visible, model_visible
                 layer.SetPersistentVisibility(persistent)
                 layer.ModelPersistentVisibility = model_persistent
+                layer.Color, layer.PlotColor = color, plot_color
+                layer.PlotWeight, layer.LinetypeIndex = plot_weight, linetype_index
                 layer.CommitChanges()
             for i in reversed(range(self.doc.Strings.Count)):
                 self.doc.Strings.Delete(self.doc.Strings.GetKey(i))

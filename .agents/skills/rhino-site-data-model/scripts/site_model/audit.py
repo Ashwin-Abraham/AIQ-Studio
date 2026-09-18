@@ -49,6 +49,8 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
     invalid_count = 0
     volumes = []
     sources = []
+    source_type_counts = Counter()
+    derived_type_counts = Counter()
     source_details = set()
     derived_references = []
     for obj in owned:
@@ -66,7 +68,7 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
             fail("stage_scope", object_id=object_id, message="2D checkpoint contains owned 3D geometry")
         if role and role.startswith("source_plan") and obj_stage != "2d":
             fail("stage_metadata", object_id=object_id, message="Source plan must belong to 2D")
-        if role and (role.startswith("terrain_") or role.startswith("building_")) and obj_stage != "3d":
+        if role and (role.startswith("terrain_") or role.startswith("building_") or role == "vertical_position_unresolved") and obj_stage != "3d":
             fail("stage_metadata", object_id=object_id, message="3D geometry must belong to 3D")
         if not geometry.IsValid:
             invalid_count += 1
@@ -76,6 +78,22 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
             bounds = geometry.GetBoundingBox()
             if not all(math.isfinite(z) and abs(z) <= 1e-8 for z in (bounds.Min.Z, bounds.Max.Z)):
                 fail("source_plan_z", object_id=object_id)
+            if role == "source_plan_fill" and (not isinstance(geometry, r3d.Mesh) or len(geometry.Faces) == 0):
+                fail("source_plan_fill", object_id=object_id, message="Plan fill must be a nonempty mesh")
+        if attrs.ColorSource != r3d.ObjectColorSource.ColorFromLayer or attrs.PlotColorSource != r3d.ObjectPlotColorSource.PlotColorFromLayer or attrs.PlotWeightSource != r3d.ObjectPlotWeightSource.PlotWeightFromLayer:
+            fail("by_layer_style", object_id=object_id)
+        source_type = attrs.GetUserString("source_feature_type")
+        if source_type:
+            (source_type_counts if obj_stage == "2d" else derived_type_counts)[source_type] += 1
+        if obj_stage == "3d" and source_type in {"bathymetry", "land_cover"}:
+            fail(source_type + "_3d_representation", object_id=object_id)
+        if role == "vertical_position_unresolved":
+            bounds = geometry.GetBoundingBox()
+            layer = layers_by_index.get(attrs.LayerIndex)
+            if not all(math.isfinite(z) and abs(z) <= 1e-8 for z in (bounds.Min.Z, bounds.Max.Z)):
+                fail("unresolved_position_z", object_id=object_id)
+            if layer is None or layer.Visible or "::Vertical Position Unresolved" not in layer.FullPath:
+                fail("unresolved_position_layer", object_id=object_id)
         if role not in {"source_plan_boundary", "terrain_draped_boundary", "terrain_mesh", "run_annotation"}:
             missing = [name for name in SOURCE_REFERENCE_KEYS if not attrs.GetUserString(name)]
             if missing:
@@ -153,6 +171,8 @@ def audit_model(model, stage, visual_inspection="not-possible", visual_notes="")
               "building_volumes": len(volumes), "terrain_skirts": roles["building_terrain_skirt"]}
     return {"stage": stage, "passed": not failures, "failures": failures, "warnings": warnings,
             "counts": counts, "role_counts": dict(sorted(roles.items())),
+            "source_type_counts": dict(sorted(source_type_counts.items())),
+            "derived_type_counts": dict(sorted(derived_type_counts.items())),
             "object_count": len(objects), "layer_count": len(layers),
             "invalid_geometry_count": invalid_count, "source_plan_object_count": len(sources),
             "building_volume_count": len(volumes), "terrain_skirt_count": roles["building_terrain_skirt"],

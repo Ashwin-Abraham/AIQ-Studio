@@ -21,7 +21,11 @@ Use this base structure. Add only category layers that contain objects.
 AIQ Site::
   2D::
     Boundary::
+    Bathymetry::
+    Base::Land::
     Buildings::
+    Infrastructure::
+    Land Cover::
     Transport::
       Roads::
       Railway::
@@ -41,6 +45,7 @@ AIQ Site::
       Parent Envelope::
       Terrain Skirts::
       Underground::Vertical Position Unresolved::
+    Infrastructure::Vertical Position Unresolved::
     Transport::
       Roads::
       Railway::
@@ -67,6 +72,9 @@ Use generic classes for layer names. Keep the exact source class, subtype, taxon
 - Clip working geometry to the context before conversion to Rhino geometry.
 - Put clipped-part indices on derived objects.
 - Keep points as points and linear networks as curves unless the user asks for widths or surfaces.
+- Represent 2D polygon themes as one sparse planar fill mesh per clipped polygon part, plus boundary curves for plotted outlines. Preserve holes in both representations.
+- Do not make 3D bathymetry or land-cover geometry. Both are source plan information.
+- Keep infrastructure 3D geometry at Z = 0 on hidden `Vertical Position Unresolved` layers until a reliable placement rule is available.
 - Drape ordinary surface roads and railways onto terrain for the 3D comparison branch.
 - Put unresolved bridges, tunnels, underground segments, and conflicting level rules in a separate unresolved layer. Do not infer their Z position.
 - Do not infer water elevation. A terrain-draped water curve is only a comparison geometry and must say so in metadata.

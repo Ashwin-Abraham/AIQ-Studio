@@ -11,9 +11,9 @@ from shapely.geometry import GeometryCollection, LineString, MultiLineString, Mu
 from shapely.ops import transform
 from shapely import make_valid
 from site_model.contract import atomic_json, file_sha256, load_json, validate_sources
-from download_overture import validate_types
-
-FEATURE_TYPES = ["building", "building_part", "segment", "water", "land", "land_use", "place"]
+from site_model.overture_types import (SUPPORTED_FEATURE_TYPES, category_path, profile,
+                                       validate_properties, validate_source_geometry,
+                                       validate_types)
 
 
 def read_geojson_geometry(path):
@@ -27,38 +27,8 @@ def read_geojson_geometry(path):
     return shape(data)
 
 
-def clean(value):
-    value = str(value or "Other Unclassified").replace("-", " ").replace("_", " ").replace("::", " ")
-    return " ".join(part.capitalize() for part in value.split())
-
-
 def name_of(properties):
     return (properties.get("names") or {}).get("primary")
-
-
-def category(feature_type, properties):
-    subtype = properties.get("subtype")
-    class_name = properties.get("class")
-    if feature_type == "building":
-        return ["Buildings", "Footprints", clean(subtype)]
-    if feature_type == "building_part":
-        return ["Buildings", "Parts", clean(subtype or class_name)]
-    if feature_type == "segment":
-        if subtype == "road":
-            return ["Transport", "Roads", clean(class_name)]
-        if subtype == "rail":
-            return ["Transport", "Railway", clean(class_name)]
-        return ["Transport", "Water Routes", clean(class_name or subtype)]
-    if feature_type == "water":
-        return ["Water", clean(subtype), clean(class_name)]
-    if feature_type == "land_use":
-        return ["Land Use", clean(subtype), clean(class_name)]
-    if feature_type == "land":
-        return ["Base", "Land", clean(class_name or subtype)]
-    if feature_type == "place":
-        hierarchy = ((properties.get("taxonomy") or {}).get("hierarchy") or [])
-        return ["Places", clean(hierarchy[0] if hierarchy else "Other")]
-    return [clean(feature_type)]
 
 
 def flatten(geometry):
@@ -118,20 +88,28 @@ def normalize_features(collections, to_local, context_geometry):
         for source_feature_index, feature in enumerate(collection['features']):
             if feature.get('geometry') is None:
                 raise ValueError('Source feature has no geometry')
-            source_geometry = transform(to_local, shape(feature['geometry']))
+            source_wgs84 = shape(feature['geometry'])
+            validate_source_geometry(feature_type, source_wgs84.geom_type)
+            properties = feature.get('properties') or {}
+            validate_properties(feature_type, properties)
+            source_geometry = transform(to_local, source_wgs84)
             parts = []
             repaired = not source_geometry.is_valid
             for source_part_index, source_part in enumerate(leaf_geometries(source_geometry)):
                 valid = source_part if source_part.is_valid else make_valid(source_part)
                 clipped = _clip_to_context(valid, context_geometry, context_bounds, context_is_box)
                 for part in flatten(clipped):
+                    # Repair and clipping can create lower-dimensional debris.
+                    # Keep only geometry that the source type can represent.
+                    if (part['kind'] != source_part.geom_type
+                            or part['kind'] not in profile(feature_type).normalized_geometry):
+                        continue
                     part['source_part_index'] = source_part_index
                     part['clipped_part_index'] = len(parts)
                     parts.append(part)
             if not parts:
                 continue
-            properties = feature.get('properties') or {}
-            records.append({'id':feature.get('id'), 'feature_type':feature_type, 'version':properties.get('version'), 'name':name_of(properties), 'category_path':category(feature_type,properties), 'properties':properties, 'sources':properties.get('sources') or [], 'source_feature_index':source_feature_index, 'source_bounds_local':list(source_geometry.bounds), 'geometry_repaired':repaired, 'parts':parts})
+            records.append({'id':feature.get('id'), 'feature_type':feature_type, 'version':properties.get('version'), 'name':name_of(properties), 'category_path':category_path(feature_type,properties), 'properties':properties, 'sources':properties.get('sources') or [], 'source_feature_index':source_feature_index, 'source_bounds_local':list(source_geometry.bounds), 'geometry_repaired':repaired, 'parts':parts})
     return records
 
 
@@ -170,11 +148,11 @@ def main():
     parser.add_argument('--site-name',required=True)
     parser.add_argument('--output',required=True,help='Unique normalized source output for this invocation')
     parser.add_argument('--report-path',required=True)
-    parser.add_argument('--types',nargs='+',choices=FEATURE_TYPES,help='Only process these types; omitted means all available files')
+    parser.add_argument('--types',nargs='+',choices=SUPPORTED_FEATURE_TYPES,help='Only process these types; omitted means all available files')
     args = parser.parse_args()
     input_dir = Path(args.input_dir).resolve()
     manifest = load_json(args.manifest)
-    selected = validate_types(args.types if args.types is not None else [kind for kind in FEATURE_TYPES if (input_dir/(kind+'.geojson')).exists()])
+    selected = validate_types(args.types if args.types is not None else [kind for kind in SUPPORTED_FEATURE_TYPES if (input_dir/(kind+'.geojson')).exists()])
     manifest_records = {record['feature_type']:record for record in manifest.get('files',[])}
     collections = {}
     for kind in selected:

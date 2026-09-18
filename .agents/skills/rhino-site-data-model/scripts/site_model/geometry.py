@@ -11,19 +11,15 @@ from shapely.geometry import Point, Polygon
 from shapely.geometry.polygon import orient
 from shapely import constrained_delaunay_triangles
 
+from .cartography import style_for
 from .contract import METADATA_CONTRACT
+from .overture_types import plan_representation, three_d_policy
 
 def triangulate(polygon):
     return list(constrained_delaunay_triangles(polygon).geoms)
 
 FLOOR_HEIGHT = 3.5
 ROOT = "AIQ Site"
-COLORS = {
-    "Buildings": (196, 126, 70, 255), "Transport": (80, 80, 80, 255),
-    "Water": (30, 125, 215, 255), "Land Use": (55, 150, 75, 255),
-    "Places": (220, 80, 140, 255), "Terrain": (170, 185, 140, 255),
-    "Boundary": (230, 45, 45, 255), "QA": (30, 30, 30, 255),
-}
 
 
 def finalize_mesh(mesh):
@@ -215,6 +211,39 @@ def flat_mass(part, bottom_z, top_z):
     return finalize_mesh(mesh)
 
 
+def planar_fill(part):
+    """Make one sparse planar mesh for a polygon part, including its holes."""
+    polygon = polygon_from_part(part)
+    mesh = r3d.Mesh()
+    for triangle in triangulate(polygon):
+        if not polygon.covers(triangle.representative_point()):
+            continue
+        points = list(orient(triangle, sign=1.0).exterior.coords)[:3]
+        start = len(mesh.Vertices)
+        for x, y in points:
+            mesh.Vertices.Add(x, y, 0.0)
+        mesh.Faces.AddFace(start, start + 1, start + 2)
+    if not len(mesh.Faces):
+        raise ValueError("Planar fill has no faces")
+    return finalize_mesh(mesh)
+
+
+def expected_source_plan_object_count(data):
+    """Count the representation objects that a 2D stage must contain."""
+    count = 0
+    if data.get('_include_context', True):
+        for boundary_name in ('site', 'context'):
+            count += sum(1 + len(part.get('holes') or [])
+                         for part in (data.get(boundary_name) or {}).get('parts') or [])
+    for record in data.get('features') or []:
+        for part in record.get('parts') or []:
+            representation = plan_representation(record['feature_type'], part['kind'])
+            count += 1
+            if representation == 'fill':
+                count += 1 + len(part.get('holes') or [])
+    return count
+
+
 def terrain_skirt(part, base_z, sampler):
     mesh = r3d.Mesh()
     rings = polygon_rings(polygon_from_part(part))
@@ -325,7 +354,7 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
     earth.ModelNorth = r3d.Vector3d(0, 1, 0)
     cache, keys, warnings = {}, set(), []
 
-    def layer(path, visible=True):
+    def layer(path, visible=True, style=None):
         parent = uuid.UUID(int=0)
         for depth in range(1, len(path.split('::')) + 1):
             full = '::'.join(path.split('::')[:depth])
@@ -334,17 +363,29 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
                 item.Name = full.split('::')[-1]
                 item.ParentLayerId = parent
                 item.Visible = visible if full == path else True
-                theme = next((part for part in full.split('::') if part in COLORS), None)
-                item.Color = COLORS.get(theme, (120, 120, 120, 255))
+                current_style = style if full == path and style else style_for()
+                item.Color = current_style.color
+                item.PlotColor = current_style.color
+                item.PlotWeight = current_style.plot_weight_mm
                 cache[full] = model.Layers.Add(item)
+            elif full == path and style:
+                item = model.Layers.FindIndex(cache[full])
+                item.Color = style.color
+                item.PlotColor = style.color
+                item.PlotWeight = style.plot_weight_mm
+                item.Visible = visible
             parent = model.Layers.FindIndex(cache[full]).Id
         return cache[path]
 
-    def add(geometry, path, name, role, record=None, part=0, hole=None, extra=None, visible=True, identity=None):
+    def add(geometry, path, name, role, record=None, part=0, hole=None, extra=None, visible=True, identity=None, style=None, order_delta=0):
+        style = style or style_for(record, role=role)
         attrs = r3d.ObjectAttributes()
-        attrs.LayerIndex = layer(path, visible)
+        attrs.LayerIndex = layer(path, visible, style)
         attrs.Name = str(name)
         attrs.ColorSource = r3d.ObjectColorSource.ColorFromLayer
+        attrs.PlotColorSource = r3d.ObjectPlotColorSource.PlotColorFromLayer
+        attrs.PlotWeightSource = r3d.ObjectPlotWeightSource.PlotWeightFromLayer
+        attrs.DisplayOrder = style.display_order + order_delta
         values = {'site_owner':'rhino-site-data-model', 'site_stage':stage, 'geometry_role':role, 'clipped_part_index':str(part)}
         if record:
             values.update(source_feature_id=str(record.get('id')), source_feature_type=str(record.get('feature_type')), source_feature_version=str(record.get('version')))
@@ -359,7 +400,9 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
             raise ValueError('Duplicate geometry identity: ' + str(key_data))
         keys.add(key)
         values['site_key'] = key
-        fingerprint = {'geometry':geometry.Encode(), 'layer':path, 'name':attrs.Name, 'visible':visible, 'metadata':values}
+        fingerprint = {'geometry':geometry.Encode(), 'layer':path, 'name':attrs.Name, 'visible':visible,
+                       'display_order':attrs.DisplayOrder, 'color':style.color,
+                       'plot_weight_mm':style.plot_weight_mm, 'metadata':values}
         values['site_content_hash'] = hashlib.sha256(json.dumps(fingerprint, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
         for key, value in values.items():
             attrs.SetUserString(key, str(value))
@@ -377,17 +420,25 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
         for part_index, part in enumerate((data.get(boundary_name) or {}).get('parts') or []):
             part_index = part.get('clipped_part_index', part_index)
             for hole_index, ring in enumerate([part['points']] + (part.get('holes') or [])):
-                add(polyline_curve(ring, z_function=z), branch+'::Boundary::'+boundary_name.title(), boundary_name.title(), 'source_plan_boundary' if stage == '2d' else 'terrain_draped_boundary', part=part_index, hole=hole_index-1 if hole_index else None, identity=boundary_name, extra={'source_part_index':part.get('source_part_index',part_index)})
+                add(polyline_curve(ring, z_function=z), branch+'::Boundary::'+boundary_name.title(), boundary_name.title(), 'source_plan_boundary' if stage == '2d' else 'terrain_draped_boundary', part=part_index, hole=hole_index-1 if hole_index else None, identity=boundary_name, extra={'source_part_index':part.get('source_part_index',part_index)}, style=style_for(boundary=boundary_name))
     for record in data.get('features') or []:
+        policy = three_d_policy(record['feature_type'])
+        if stage == '3d' and policy == 'omit':
+            continue
         category = [safe_name(v) for v in record.get('category_path') or ['Other']]
         path = branch+'::'+'::'.join(category)
         name = record.get('name') or '{} {}'.format(record.get('feature_type'),record.get('id'))
         props = record.get('properties') or {}
         underground = record.get('feature_type') == 'building_part' and props.get('is_underground')
         unresolved_transport = category[0] == 'Transport' and unresolved_transport_placement(props)
-        unresolved = stage == '3d' and (underground or unresolved_transport)
+        unresolved = stage == '3d' and (underground or unresolved_transport or policy == 'unresolved')
         if unresolved:
-            path = branch + ('::Buildings::Underground::Vertical Position Unresolved' if underground else '::Transport::Vertical Position Unresolved')
+            if underground:
+                path = branch + '::Buildings::Underground::Vertical Position Unresolved'
+            elif record['feature_type'] == 'infrastructure':
+                path = branch + '::Infrastructure::Vertical Position Unresolved::' + (category[1] if len(category) > 1 else 'Other Unclassified')
+            else:
+                path = branch + '::Transport::Vertical Position Unresolved'
         for part_index, part in enumerate(record.get('parts') or []):
             part_index = part.get('clipped_part_index', part_index)
             part_metadata = {'source_part_index':part.get('source_part_index',part_index)}
@@ -400,13 +451,19 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
             if unresolved:
                 role = 'vertical_position_unresolved'
                 extra['placement_method'] = 'unresolved; source plan at Z=0'
+            style = style_for(record, role=role)
             if part['kind'] == 'Point':
                 x,y,_ = part['points'][0]
-                add(r3d.Point(r3d.Point3d(x,y,local_z(x,y))), path, name, role, record, part_index, extra=extra, visible=not unresolved)
-            else:
-                add(polyline_curve(part['points'], z_function=local_z), path, name, role, record, part_index, extra=extra, visible=not unresolved)
+                add(r3d.Point(r3d.Point3d(x,y,local_z(x,y))), path, name, role, record, part_index, extra=extra, visible=not unresolved, style=style)
+            elif stage == '2d' and plan_representation(record['feature_type'], part['kind']) == 'fill':
+                add(planar_fill(part), path, name, 'source_plan_fill', record, part_index, extra=extra, style=style)
+                add(polyline_curve(part['points'], z_override=0.0), path, name+' outline', 'source_plan_outline', record, part_index, extra=extra, style=style, order_delta=1)
                 for hole_index,hole in enumerate(part.get('holes') or []):
-                    add(polyline_curve(hole,z_function=local_z),path,name+' hole', 'source_plan_hole' if stage == '2d' else 'terrain_draped_hole',record,part_index,hole_index,extra,not unresolved)
+                    add(polyline_curve(hole,z_override=0.0),path,name+' hole','source_plan_hole',record,part_index,hole_index,extra,True,style=style,order_delta=1)
+            else:
+                add(polyline_curve(part['points'], z_function=local_z), path, name, role, record, part_index, extra=extra, visible=not unresolved, style=style)
+                for hole_index,hole in enumerate(part.get('holes') or []):
+                    add(polyline_curve(hole,z_function=local_z),path,name+' hole', 'source_plan_hole' if stage == '2d' else 'terrain_draped_hole',record,part_index,hole_index,extra,not unresolved,style=style)
             if stage == '2d' or record.get('feature_type') not in {'building','building_part'} or part['kind'] != 'Polygon':
                 continue
             height, method, estimated = height_rule(record)
@@ -440,6 +497,6 @@ def prepare_stage(data, stage, terrain=None, flat_elevation=None):
     lines = [run['site_name'], 'Stage: '+stage, 'Generated: '+run['generated_utc'], 'Source: '+run['semantic_source']+' '+run['source_release'], 'CRS: '+run['projected_crs'], 'Vertical datum: '+str(run.get('vertical_datum') or 'not set'), 'Manifest: '+run.get('source_manifest_path',''), 'Report: '+run.get('report_path','')]
     for index,text in enumerate(lines if include_context else []):
         dot = r3d.TextDot(text,r3d.Point3d(bounds[0],bounds[3]-index*5,0))
-        add(dot,ROOT+'::QA::Annotations::Run Info::'+stage.upper(),'Run Info','run_annotation',part=index,identity='run')
+        add(dot,ROOT+'::QA::Annotations::Run Info::'+stage.upper(),'Run Info','run_annotation',part=index,identity='run',style=style_for(role='run_annotation'))
     model.Strings['site.warnings'] = json.dumps(warnings)
     return model

@@ -14,17 +14,10 @@ import sys
 import tempfile
 
 from site_model.contract import atomic_json, confined_path, file_sha256, load_json
+from site_model.overture_types import SUPPORTED_FEATURE_TYPES, validate_types
 
-DEFAULT_TYPES = ['building', 'building_part', 'segment', 'water', 'land', 'land_use', 'place']
+DEFAULT_TYPES = list(SUPPORTED_FEATURE_TYPES)
 file_hash = file_sha256
-
-
-def validate_types(feature_types):
-    if not feature_types or len(set(feature_types)) != len(feature_types):
-        raise ValueError('Choose one or more distinct feature types')
-    if any(value not in DEFAULT_TYPES for value in feature_types):
-        raise ValueError('Unsupported feature type; use: ' + ', '.join(DEFAULT_TYPES))
-    return list(feature_types)
 
 
 def download_sources(bbox, output_dir, release=None, feature_types=None, workers=1, runner=None):

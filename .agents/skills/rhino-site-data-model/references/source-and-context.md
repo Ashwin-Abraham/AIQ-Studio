@@ -25,8 +25,12 @@ Use Overture Maps by default for:
 - buildings and building parts;
 - transport segments;
 - water;
-- land and land use;
+- bathymetry;
+- infrastructure;
+- land, land use, and land cover;
 - places.
+
+Bathymetry is a set of overlapping depth-threshold polygons. Keep it at Z = 0, and draw deeper thresholds above shallower thresholds. Do not convert `depth` to Z. Land cover is categorical 2D source data, not terrain. Treat infrastructure height as object height, not base elevation. Keep its 3D vertical position unresolved unless a separate rule gives a reliable base elevation.
 
 Use the latest Overture release unless the user pins a release. Record the release ID, retrieval time, download bounds, file hashes, and tool versions.
 

@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from site_model.geometry import prepare_stage, TerrainSampler, polygon_from_part, flat_mass, reference_ground
+from site_model.geometry import (prepare_stage, TerrainSampler, polygon_from_part,
+                                 flat_mass, planar_fill, reference_ground)
 
 def fixture():
     part={'kind':'Polygon','points':[[0,0,9],[10,0,9],[10,10,9],[0,10,9],[0,0,9]],'holes':[[[3,3,9],[3,7,9],[7,7,9],[7,3,9],[3,3,9]]]}
@@ -105,6 +106,13 @@ class GeometryTests(unittest.TestCase):
         first=hashes(prepare_stage(fixture(),'2d'));second=hashes(prepare_stage(fixture(),'2d'));self.assertEqual(first,second)
         data=fixture();data['features'][0]['parts'][0]['points'][1][0]=11
         third=hashes(prepare_stage(data,'2d'));self.assertEqual(set(first),set(third));self.assertNotEqual(first,third)
+        from site_model.cartography import LayerStyle, style_for as real_style
+        def changed_style(record=None, **options):
+            style=real_style(record, **options)
+            return LayerStyle(style.color,style.plot_weight_mm,style.display_order+(7 if record else 0))
+        with patch('site_model.geometry.style_for',side_effect=changed_style):
+            fourth=hashes(prepare_stage(fixture(),'2d'))
+        self.assertEqual(set(first),set(fourth));self.assertNotEqual(first,fourth)
     def test_terrain_rejects_missing_and_outside(self):
         terrain={'rows':[[[0,0,1],[10,0,2]],[[0,10,3],[10,10,4]]]};sampler=TerrainSampler(terrain)
         self.assertAlmostEqual(sampler.z(5,5),2.5)
@@ -119,4 +127,39 @@ class GeometryTests(unittest.TestCase):
             if obj.Attributes.GetUserString('geometry_role')!='building_volume':continue
             if obj.Attributes.GetUserString('source_feature_id')=='building1':self.assertFalse(model.Layers.FindIndex(obj.Attributes.LayerIndex).Visible)
             else:self.assertAlmostEqual(obj.Geometry.GetBoundingBox().Min.Z,6)
+
+    def test_planar_fill_preserves_hole_and_is_flat(self):
+        from shapely.geometry import Polygon
+        part=fixture()['features'][0]['parts'][0]
+        mesh=planar_fill(part)
+        area=0
+        polygon=polygon_from_part(part)
+        for a,b,c,d in mesh.Faces:
+            points=[mesh.Vertices[i] for i in (a,b,c)]
+            triangle=Polygon([(point.X,point.Y) for point in points])
+            self.assertTrue(polygon.covers(triangle))
+            self.assertTrue(all(point.Z == 0 for point in points))
+            area+=triangle.area
+        self.assertAlmostEqual(area,polygon.area)
+        self.assertEqual(len(mesh.Normals),len(mesh.Vertices))
+
+    def test_new_themes_have_safe_2d_and_3d_representations(self):
+        data=fixture();part=data['features'][0]['parts'][0]
+        data['features']=[
+            {'id':'bathy','feature_type':'bathymetry','version':1,'category_path':['Bathymetry','Depth 20 m'],'properties':{'depth':20},'sources':[],'parts':[part]},
+            {'id':'cover','feature_type':'land_cover','version':1,'category_path':['Land Cover','Forest'],'properties':{'subtype':'forest'},'sources':[],'parts':[part]},
+            {'id':'infra','feature_type':'infrastructure','version':1,'category_path':['Infrastructure','Power','Substation'],'properties':{'subtype':'power','class':'substation','height':12},'sources':[],'parts':[{'kind':'Point','points':[[5,5,0]],'source_part_index':0,'clipped_part_index':0}]},
+        ]
+        plan=prepare_stage(data,'2d')
+        fills=[obj for obj in plan.Objects if obj.Attributes.GetUserString('geometry_role')=='source_plan_fill']
+        self.assertEqual({obj.Attributes.GetUserString('source_feature_type') for obj in fills},{'bathymetry','land_cover'})
+        for obj in fills:
+            self.assertEqual(obj.Geometry.GetBoundingBox().Min.Z,0)
+            self.assertEqual(obj.Attributes.PlotWeightSource.name,'PlotWeightFromLayer')
+        model=prepare_stage(data,'3d',flat_elevation=7)
+        derived=[obj for obj in model.Objects if obj.Attributes.GetUserString('source_feature_type')]
+        self.assertEqual({obj.Attributes.GetUserString('source_feature_type') for obj in derived},{'infrastructure'})
+        item=derived[0];self.assertEqual(item.Attributes.GetUserString('geometry_role'),'vertical_position_unresolved')
+        self.assertEqual(item.Geometry.GetBoundingBox().Max.Z,0)
+        self.assertFalse(model.Layers.FindIndex(item.Attributes.LayerIndex).Visible)
 if __name__=='__main__':unittest.main()

@@ -11,10 +11,12 @@ import os
 from pathlib import Path
 import tempfile
 
+from .overture_types import (SUPPORTED_FEATURE_TYPES, validate_normalized_geometry,
+                             validate_properties)
+
 CHECKPOINT_SCHEMA = "rhino-site-model-checkpoint"
-CONTRACT_VERSION = 1
-METADATA_CONTRACT = "source-payload-2d-v1"
-EXCLUDED_FEATURE_TYPES = frozenset(("connector",))
+CONTRACT_VERSION = 2
+METADATA_CONTRACT = "source-payload-2d-v2"
 _RUN_TEXT = ("site_name", "generated_utc", "semantic_source", "source_release",
              "projected_crs", "vertical_datum", "source_manifest_path", "report_path")
 
@@ -123,7 +125,7 @@ def validate_sources(data):
             raise ValueError("Each feature must be an object")
         for name in ("id", "feature_type"):
             _text(feature.get(name), "feature." + name)
-        if feature["feature_type"] in EXCLUDED_FEATURE_TYPES:
+        if feature["feature_type"] not in SUPPORTED_FEATURE_TYPES:
             raise ValueError("Unsupported source feature type: " + feature["feature_type"])
         identity = (feature["feature_type"], feature["id"])
         if identity in identities:
@@ -138,7 +140,10 @@ def validate_sources(data):
                 raise ValueError("Category names cannot contain the layer separator ::")
         if not isinstance(feature.get("properties"), dict) or not isinstance(feature.get("sources"), list):
             raise ValueError("Features require properties and sources")
+        validate_properties(feature["feature_type"], feature["properties"])
         _parts(feature.get("parts"), "feature.parts")
+        for part in feature["parts"]:
+            validate_normalized_geometry(feature["feature_type"], part["kind"])
     _canonical(data)
     return data
 
