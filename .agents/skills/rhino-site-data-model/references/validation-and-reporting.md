@@ -2,7 +2,9 @@
 
 Validation records failures. It does not stop model creation by itself.
 
-Use `scripts/run_site_model.py --audit-only` with the target output, project root, and selected stage. This writes a separate `.2d.review.audit.json` or `.3d.review.audit.json` file, preserving the checkpoint audit. The old separate validator is no longer used. Contract errors, changed checkpoint hashes, and frame conflicts stop the run before inconsistent data can be applied.
+Use `scripts/run_site_model.py --audit-only` with the target output, project root, and selected stage. This writes a separate `.2d.review.audit.json` or `.3d.review.audit.json` file, preserving the checkpoint audit. Contract errors, changed checkpoint hashes, and frame conflicts stop the run before inconsistent data can be applied.
+
+The coordinator's save-and-reopen audit is the stage audit. Do not run `--audit-only` immediately afterward unless the model changed or an independent or visual review is required.
 
 Check and save the complete 2D stage before 3D preparation. A 2D audit marks 3D placement checks as not applicable. A 3D audit also checks the retained 2D geometry. Read the audit results; `checked_and_saved` in a checkpoint does not mean all checks passed.
 

@@ -60,13 +60,13 @@ Use `--stage 3d` to check a completed 3D model, including its retained 2D source
 
 Generated objects carry `site_owner`, `site_stage`, and a stable `site_key`. Repeat runs replace owned outputs for the selected stage. They preserve user objects. A fresh 2D stage removes old owned 3D outputs because those outputs can refer to changed sources. A 3D stage keeps the checked 2D objects.
 
-Do not remove existing objects solely because their layer starts with `AIQ Site`. Legacy models without ownership metadata need an explicit migration decision before replacement.
+Do not remove existing objects solely because their layer starts with `AIQ Site`. Models without ownership metadata need an explicit migration decision before replacement.
 
 A 3D run stops before preparation if the checkpoint source digest, saved model hash, or referenced audit hash differs. Resolve the changed input or repeat the 2D stage; do not edit hashes by hand. Geometry audit failures are recorded in the report. Contract, frame, and file-integrity errors block a run because the inputs cannot be applied consistently.
 
-## Legacy data
+## Combined-data migration
 
-Use this entry point instead of the old combined builder and validator. The old builder remains only because saved project scripts import its functions. The unused validator is removed. Preserve original source files when migrating a JSON file that contains both features and terrain:
+Use `--migrate-input` to split a combined source-and-terrain JSON input. Preserve the original source file:
 
 ```text
 run_site_model.py --project-root PROJECT --migrate-input processed/legacy.json --input processed/sources.json --terrain-output processed/terrain.json

@@ -122,7 +122,7 @@ For image capture, use the [rhino-image-capture skill](skills/rhino-image-captur
 
 ## Validation
 
-Validate each completed stage enough to prevent invalid state from accumulating. Run full validation after the final mutation.
+Use lightweight checks during batches. Run full validation only at each required saved-stage boundary, including the final save. Do not repeat a successful save-and-reopen audit unless the document, source inputs, or review requirements changed.
 
 Validate through RhinoCommon and saved-file checks. Capture review images through the Rhino API. Preserve the user's view and selection. Report unavailable checks as incomplete. A captured image is not a completed visual check; inspect it and record the result.
 
