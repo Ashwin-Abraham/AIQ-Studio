@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from site_model.contract import (atomic_json, check_checkpoint, confined_path,
+from site_model.contract import (CONTRACT_VERSION, atomic_json, check_checkpoint, confined_path,
                                  file_sha256, load_json, source_digest,
                                  validate_sources, validate_terrain)
 
@@ -158,11 +158,11 @@ class ContractTests(unittest.TestCase):
             audit = Path(directory) / "audit.json"
             atomic_json(audit, {"checked": True})
             data = sources()
-            checkpoint = {"schema": "rhino-site-model-checkpoint", "version": 1,
+            checkpoint = {"schema": "rhino-site-model-checkpoint", "version": CONTRACT_VERSION,
                           "source_digest": source_digest(data), "model_sha256": file_sha256(model),
                           "checked_and_saved": True, "audit_path": "audit.json", "audit_sha256": file_sha256(audit)}
             self.assertIs(checkpoint, check_checkpoint(checkpoint, data, model))
-            for key, value in (("version", 2), ("checked_and_saved", False), ("source_digest", "stale"), ("model_sha256", "stale")):
+            for key, value in (("version", CONTRACT_VERSION + 1), ("checked_and_saved", False), ("source_digest", "stale"), ("model_sha256", "stale")):
                 changed = dict(checkpoint, **{key: value})
                 with self.subTest(key=key), self.assertRaises(ValueError):
                     check_checkpoint(changed, data, model)

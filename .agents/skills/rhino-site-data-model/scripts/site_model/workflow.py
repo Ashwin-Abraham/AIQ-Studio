@@ -252,9 +252,8 @@ def run(project_root, input_path, output_path, stage="all", backend="live", terr
             audit["writer_counts"] = writer.counts
             audit["source_feature_count"] = len(data["features"])
             audit["source_digest"] = source_digest(data)
-            expected_plan_count = sum(1 + len(part.get("holes") or [])
-                                      for section in (data["site"], data["context"], *data["features"])
-                                      for part in section["parts"])
+            from .geometry import expected_source_plan_object_count
+            expected_plan_count = expected_source_plan_object_count(data)
             audit["expected_source_plan_object_count"] = expected_plan_count
             if audit.get("source_plan_object_count") != expected_plan_count:
                 audit["failures"].append({"check": "source_count_reconciliation", "expected": expected_plan_count,

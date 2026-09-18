@@ -40,6 +40,12 @@ class WorkflowTests(unittest.TestCase):
             result = self.run_stage("2d")
         self.assertTrue(result["stages"][0]["passed"], result)
         plan = r3d.File3dm.Read(str(self.output))
+        fill = next(o for o in plan.Objects if o.Attributes.GetUserString('geometry_role') == 'source_plan_fill')
+        layer = plan.Layers.FindIndex(fill.Attributes.LayerIndex)
+        self.assertEqual(fill.Attributes.DisplayOrder, 70000)
+        self.assertEqual(fill.Attributes.PlotWeightSource, r3d.ObjectPlotWeightSource.PlotWeightFromLayer)
+        self.assertAlmostEqual(layer.PlotWeight, .18)
+        self.assertEqual(tuple(layer.Color)[:3], (135,135,132))
         identities = {str(o.Attributes.Id) for o in plan.Objects}
         result = self.run_stage("3d", flat_elevation=0)
         self.assertTrue(result["stages"][0]["passed"], result)

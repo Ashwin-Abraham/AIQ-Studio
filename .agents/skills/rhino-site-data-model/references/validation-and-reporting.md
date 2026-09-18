@@ -20,6 +20,11 @@ Check and save the complete 2D stage before 3D preparation. A 2D audit marks 3D 
 - All derived 3D objects have a source type, ID, and version that resolve to retained 2D source metadata. They do not duplicate exact source properties, source records, or generic classification.
 - All geometry is valid.
 - Polygon holes and multipolygon parts are accounted for.
+- Filled plan regions are nonempty planar meshes at Z = 0, with separate plotted outlines.
+- Generated layer colours and plot widths match the cartographic reference. Object colour, plot colour, and plot width are `ByLayer`.
+- Display order follows the section hierarchy. Primary routes are above secondary routes. Deeper bathymetry thresholds are above shallower thresholds.
+- Bathymetry and land cover have no derived 3D geometry. Bathymetry depth is not used as Z.
+- Infrastructure without a reliable base elevation stays at Z = 0 on a hidden `Vertical Position Unresolved` layer.
 - In 3D, all building masses extend in world `+Z`.
 - In 3D, no main building mass starts below its reference ground elevation.
 - In 3D, building-part bottom and top elevations follow the placement rules.

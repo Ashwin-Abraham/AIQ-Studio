@@ -1,6 +1,6 @@
 ---
 name: rhino-site-data-model
-description: Build or update a geospatial Rhino site data model from a user-defined site. Use for Overture-based buildings, transport, water, land use, places, terrain, classified Rhino layers, source metadata, and model validation. Do not use for ordinary Rhino modelling that has no geographic site data.
+description: Build or update a geospatial Rhino site data model from a user-defined site. Use for Overture-based buildings, transport, infrastructure, water, bathymetry, land, land use, land cover, places, terrain, classified Rhino layers, source metadata, and model validation. Do not use for ordinary Rhino modelling that has no geographic site data.
 ---
 
 # Rhino Site Data Model
@@ -33,7 +33,7 @@ Run independent workflow steps in parallel with sub-agents when possible. After 
 1. Resolve the target Rhino model. Create a model if there is no existing model at the specified location.
 2. Resolve the site boundary. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
 3. Read [source and context rules](references/source-and-context.md). Select the source release and context.
-4. Read [Rhino structure](references/rhino-structure.md). Resolve units, coordinates, layers, and the existing-model policy.
+4. Read [Rhino structure](references/rhino-structure.md) and the [2D cartographic style reference](references/2d-cartographic-style.md). Resolve units, coordinates, layers, draw order, and the existing-model policy.
 5. Find the best available source for terrain and ask the user if a 3D model with terrain and projected objects is required (alongside a flat 2D model).
 6. When 3D buildings are in scope, read [building placement](references/building-placement.md) before creating geometry.
 7. Acquire independent source themes in parallel where useful. Give each worker separate outputs. Read the [processed data contract](references/processed-data-contract.md) and [staged workflow](references/staged-workflow.md). Process shared source geometry without terrain. Terrain downloads can run during 2D work.
@@ -43,7 +43,7 @@ Run independent workflow steps in parallel with sub-agents when possible. After 
 
 ## Reusable scripts
 
-Use `scripts/run_site_model.py` for new runs. `build_rhino_site_model.py` is compatibility-only for existing imports.
+Use `scripts/run_site_model.py` for all runs.
 
 - `scripts/download_overture.py`: download selected Overture feature types and write a source manifest.
 - `scripts/derive_context.py`: select a projected CRS and calculate context bounds from a site boundary.

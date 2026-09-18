@@ -42,7 +42,9 @@ Context should retain `selection_method`, `bounds_wgs84`, and `bounds_local` for
 
 Each feature needs a nonempty string ID and type, at least one category name, properties, source records, and geometry parts. The pair `(feature_type, id)` must be unique. Category names cannot contain the Rhino layer separator `::`. Retain exact source properties, including height fields; do not replace them with generic categories.
 
-Do not put Overture transport connector features in processed source data. The contract rejects the `connector` feature type. Transport segment source properties can retain their exact connector references as source metadata, but the workflow does not download, normalize, or create connector point objects.
+Supported Overture feature types are `building`, `building_part`, `segment`, `water`, `land`, `land_use`, `place`, `bathymetry`, `infrastructure`, and `land_cover`. Do not put Overture transport connector features in processed source data. Transport segment source properties can retain their exact connector references as source metadata, but the workflow does not download, normalize, or create connector point objects.
+
+Bathymetry requires a non-negative integer `depth`. Land cover requires one published Overture land-cover subtype. Infrastructure requires nonempty `subtype` and `class` values. The contract rejects source and normalized geometry kinds that are not allowed for their feature type.
 
 The processed source file remains the complete source-of-truth record. In Rhino, put the complete `source_properties_json`, `source_records_json`, and generic classification only on 2D source objects. A derived 3D object keeps `source_feature_type`, `source_feature_id`, `source_feature_version`, and its derived or placement fields. Resolve its complete source metadata by matching that three-field reference to a retained 2D source object. Do not copy the complete source JSON onto derived objects.
 
@@ -81,7 +83,7 @@ The coordinator writes a checkpoint after it saves, reopens, and checks the 2D m
 ```json
 {
   "schema": "rhino-site-model-checkpoint",
-  "version": 1,
+  "version": 2,
   "source_digest": "SHA-256 of shared source content",
   "model_sha256": "SHA-256 of saved model bytes",
   "checked_and_saved": true,

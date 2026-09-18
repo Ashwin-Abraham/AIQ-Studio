@@ -6,7 +6,8 @@ import threading
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from download_overture import DEFAULT_TYPES, download_sources, validate_types
-from process_overture import FEATURE_TYPES, _clip_to_context, normalize_features, process_sources
+from process_overture import _clip_to_context, normalize_features, process_sources
+from site_model.overture_types import SUPPORTED_FEATURE_TYPES
 from shapely.geometry import box, mapping, Polygon, MultiPolygon
 
 
@@ -60,7 +61,8 @@ class AcquisitionTests(unittest.TestCase):
             self.assertFalse((Path(temp)/'source-manifest.json').exists())
     def test_connector_is_not_a_download_or_normalization_type(self):
         self.assertNotIn('connector',DEFAULT_TYPES)
-        self.assertNotIn('connector',FEATURE_TYPES)
+        self.assertNotIn('connector',SUPPORTED_FEATURE_TYPES)
+        self.assertTrue({'bathymetry','infrastructure','land_cover'}.issubset(DEFAULT_TYPES))
         with self.assertRaisesRegex(ValueError,'Unsupported feature type'):
             validate_types(['connector'])
 
@@ -78,10 +80,10 @@ class NormalizationTests(unittest.TestCase):
         context=box(0,0,10,10).difference(box(4,4,6,6));geometry=box(4.5,4.5,5.5,5.5)
         clipped=_clip_to_context(geometry,context,context.bounds,False)
         self.assertTrue(clipped.is_empty)
-    def test_repair_retains_collapsed_line_and_polygon(self):
+    def test_repair_discards_lower_dimensional_polygon_debris(self):
         polygon=Polygon([(0,0),(2,0),(2,2),(1,2),(1,3),(1,2),(0,2),(0,0)])
         records=normalize_features({'water':collection(feature(polygon))},lambda x,y,z=None:(x,y),box(-1,-1,4,4))
-        self.assertEqual({part['kind'] for part in records[0]['parts']},{'Polygon','LineString'})
+        self.assertEqual({part['kind'] for part in records[0]['parts']},{'Polygon'})
         self.assertTrue(records[0]['geometry_repaired'])
         self.assertEqual({part['source_part_index'] for part in records[0]['parts']},{0})
     def test_source_parts_and_clipped_parts_remain_identifiable(self):
@@ -94,5 +96,27 @@ class NormalizationTests(unittest.TestCase):
         data=process_sources({'building':collection(feature(box(0,0,.001,.001)))},box(0,0,.001,.001),context,{'release':'2026-08-19.0'},'test','manifest','report','2026-01-01')
         self.assertNotIn('terrain',data);self.assertEqual(len(data['features']),1)
         with self.assertRaises(ValueError):process_sources({'building':collection(feature(box(0,0,.001,.001)),feature(box(0,0,.001,.001)))},box(0,0,.001,.001),context,{'release':'2026-08-19.0'},'test','manifest','report')
+
+    def test_new_type_categories_and_semantics(self):
+        items = [
+            ('bathymetry', box(0,0,2,2), {'depth':20}, ['Bathymetry','Depth 20 m']),
+            ('land_cover', box(0,0,2,2), {'subtype':'forest'}, ['Land Cover','Forest']),
+            ('infrastructure', box(0,0,2,2), {'subtype':'power','class':'substation','height':12}, ['Infrastructure','Power','Substation']),
+        ]
+        for kind, geometry, properties, expected in items:
+            item=feature(geometry,kind);item['properties'].update(properties)
+            record=normalize_features({kind:collection(item)},lambda x,y,z=None:(x,y),box(-1,-1,3,3))[0]
+            self.assertEqual(record['category_path'],expected)
+            for key,value in properties.items():self.assertEqual(record['properties'][key],value)
+        for properties in ({}, {'depth':-1}, {'depth':True}, {'depth':1.5}):
+            item=feature(box(0,0,1,1));item['properties']=properties
+            with self.assertRaisesRegex(ValueError,'depth'):
+                normalize_features({'bathymetry':collection(item)},lambda x,y,z=None:(x,y),box(-1,-1,2,2))
+
+    def test_land_cover_rejects_line_geometry(self):
+        from shapely.geometry import LineString
+        item=feature(LineString([(0,0),(1,1)]));item['properties']['subtype']='grass'
+        with self.assertRaisesRegex(ValueError,'does not accept'):
+            normalize_features({'land_cover':collection(item)},lambda x,y,z=None:(x,y),box(-1,-1,2,2))
 
 if __name__=='__main__':unittest.main()
