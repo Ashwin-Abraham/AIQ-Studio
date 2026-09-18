@@ -15,7 +15,7 @@ One UTF-8 JSON object contains shared source geometry. Coordinates use local pro
 }
 ```
 
-Terrain belongs in a separate file. An empty legacy `terrain: {}` is accepted; populated terrain is rejected. An empty feature list is valid, but both site and context need polygon parts.
+Terrain belongs in a separate file. An empty `terrain: {}` is accepted for compatibility; populated terrain is rejected. An empty feature list is valid, but both site and context need polygon parts.
 
 The `run` object requires nonempty strings for `site_name`, `generated_utc`, `semantic_source`, `source_release`, `projected_crs`, `vertical_datum`, `source_manifest_path`, and `report_path`. Use `"not set"` for the source vertical datum when no terrain datum applies. It also requires `origin_wgs84: [longitude, latitude]` and `origin_projected: [easting, northing]`.
 
@@ -92,7 +92,7 @@ The coordinator writes a checkpoint after it saves, reopens, and checks the 2D m
 
 `checked_and_saved` records completion of the check and save; it does not mean every geometry check passed. Read the audit failures. A 3D run verifies the source digest and saved model hash before preparation. If an audit reference is present, its path and hash must both be present and its bytes must match.
 
-The source digest excludes `generated_utc`, `report_path`, `source_manifest_path`, and `vertical_datum` from run metadata. It includes source geometry, properties, release, and coordinate frame. Empty legacy terrain is excluded. The coordinator updates the saved model hash after a completed 3D run so later 3D runs can replace that stage without a false stale-file error.
+The source digest excludes `generated_utc`, `report_path`, `source_manifest_path`, and `vertical_datum` from run metadata. It includes source geometry, properties, release, and coordinate frame. Empty terrain objects are excluded. The coordinator updates the saved model hash after a completed 3D run so later 3D runs can replace that stage without a false stale-file error.
 
 ## File integrity
 

@@ -28,7 +28,7 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 
 ## Workflow
 
-The following steps must run in parallel with sub-agents when they do not depend on each other, to reduce completion time.
+Run independent workflow steps in parallel with sub-agents when possible. After preflight succeeds, treat Rhino writing as the critical path: start the single writer when the first ordered batch is ready, and prepare later batches concurrently.
 
 1. Resolve the target Rhino model. Create a model if there is no existing model at the specified location.
 2. Resolve the site boundary. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
@@ -43,7 +43,7 @@ The following steps must run in parallel with sub-agents when they do not depend
 
 ## Reusable scripts
 
-The staged entry point replaces the combined workflow. Keep the old `build_rhino_site_model.py` only for existing project scripts that import it. Do not use it for new runs.
+Use `scripts/run_site_model.py` for new runs. `build_rhino_site_model.py` is compatibility-only for existing imports.
 
 - `scripts/download_overture.py`: download selected Overture feature types and write a source manifest.
 - `scripts/derive_context.py`: select a projected CRS and calculate context bounds from a site boundary.
