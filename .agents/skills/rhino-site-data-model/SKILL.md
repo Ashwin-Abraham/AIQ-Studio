@@ -18,17 +18,18 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 - Do not infer water levels or unresolved bridge, tunnel, or underground positions.
 - Generate every building volume along world `+Z`. Never let curve direction control the volume direction.
 - Record validation failures. Do not stop model generation only because a validation check fails.
-- Use sub agents where possible to speed up the workflow. Do not let them write to the same Rhino document at the same time.
+- It is important to use sub agents where possible to speed up the workflow. Do not let them write to the same Rhino document at the same time.
 
 ## Project guidance
 
+- Read [subagent delegation guidance](../../SUBAGENT-DELEGATION-GUIDANCE.md) before you delegate work.
 - Read [Rhino document editing guidance](../../RHINO-DOCUMENT-EDITING-GUIDANCE.md) before you select an editing method or change a Rhino document. Follow its rules for progressive edits, document identity, progress display, cancellation, undo, and saving.
 - Read [Python scripting guidance](../../PYTHON-SCRIPTING-GUIDANCE.md) before you create or adapt Python scripts, manage dependencies, or select a runtime environment.
 - Read [project folder organisation](../../PROJECT-FOLDER-ORGANISATION.md) before you create project folders or place models, source data, processed data, reports, scripts, or exports.
 
 ## Workflow
 
-Run independent workflow steps in parallel with sub-agents when possible. After preflight succeeds, treat Rhino writing as the critical path: start the single writer when the first ordered batch is ready, and prepare later batches concurrently.
+It is important to run independent workflow steps in parallel with sub-agents when possible. After preflight succeeds, treat Rhino writing as the critical path: start the single writer when the first ordered batch is ready, and prepare later batches concurrently.
 
 1. Resolve the target Rhino model. Create a model if there is no existing model at the specified location.
 2. Resolve the site boundary. Use this boundary priority: user geometry, selected mapped feature, user-approved inferred boundary, then context-only geometry.
