@@ -14,23 +14,23 @@ Then use the checked model for the map workflow:
 
 > Use Vector Site Maps to make site analysis boards from this model.
 
-## Workflow and example outputs
+## Example outputs
 
 This example uses the Thames Wharf site in Poplar, London. The site model joins mapped buildings, streets, land, water, and terrain in one `.3dm` file. It keeps the checked 2D source layers, adds 3D building volumes, and records source data and validation results.
 
-### 1. Review the Rhino site model
+### Rhino site model
 
-These close views use the same elevated Rhino camera. Layer visibility and display mode change to show each part of the model.
+The `.3dm` model has 344 layers of site data. The wide view shows the model and its main layer groups. The close views show the terrain mesh in section and building detail.
 
-![Close Rhino view of the Thames Wharf site model, with building volumes beside the river](docs/images/poplar/model-context.png)
+![Rhino view of the Thames Wharf model with its main layer groups](docs/images/poplar/model-context.png)
 
-| Building volumes and terrain | Streets, land and water with buildings hidden |
+| Terrain mesh in section | Building detail |
 | :---: | :---: |
-| [![Rhino view of building volumes and terrain](docs/images/poplar/model-buildings.png)](docs/images/poplar/model-buildings.png) | [![Rhino view of streets, land and water](docs/images/poplar/model-landscape.png)](docs/images/poplar/model-landscape.png) |
+| [![Rhino view of a cutaway from the terrain mesh](docs/images/poplar/model-terrain-section.png)](docs/images/poplar/model-terrain-section.png) | [![Close Rhino view of building volumes by the river](docs/images/poplar/model-building-detail.png)](docs/images/poplar/model-building-detail.png) |
 
-### 2. Make vector site maps
+### Vector site maps
 
-The map workflow uses one checked 2D source and one shared map frame. Each SVG contains its base map and theme artwork. The boards show figure ground, green structure, and blue structure. Select a map to open the full SVG.
+The editable SVG maps share one frame. Each map contains its base map and one theme: figure ground, green structure, or blue structure.
 
 | Figure ground | Green structure | Blue structure |
 | :---: | :---: | :---: |
