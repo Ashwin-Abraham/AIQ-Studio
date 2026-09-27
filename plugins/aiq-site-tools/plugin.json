@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "aiq-site-tools",
+  "version": "0.1.0",
+  "description": "Create Rhino site data models and vector site analysis maps.",
+  "author": {"name": "AIQ Studio"},
+  "repository": "https://github.com/Ashwin-Abraham/AIQ-Studio",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "AIQ Site Tools",
+        "shortDescription": "Make Rhino site models and site analysis maps.",
+        "longDescription": "Build a checked geospatial site model in Rhino, then create vector site analysis maps from the same source data.",
+        "developerName": "AIQ Studio",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "defaultPrompt": "Use AIQ Site Tools to create a Rhino site model for my site. Ask me for the site boundary and output folder."
+      }
+    }
+  }
+}

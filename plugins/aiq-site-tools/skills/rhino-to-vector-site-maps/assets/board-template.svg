@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297" role="img" aria-labelledby="title desc">
+  <title id="title">Site analysis board template</title>
+  <desc id="desc">A3 landscape layout with an intentionally borderless map frame, title, legend area, and source note. It contains no geographic map or scale bar.</desc>
+  <rect width="420" height="297" fill="#FFFFFF"/>
+  <rect x="16" y="15" width="388" height="267" fill="none" stroke="#252525" stroke-width="0.35"/>
+  <text x="20" y="31" fill="#252525" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="700">THEME TITLE</text>
+  <text x="402" y="30" text-anchor="end" fill="#666666" font-family="Arial, Helvetica, sans-serif" font-size="3.5">SITE ANALYSIS</text>
+  <line x1="20" y1="36" x2="400" y2="36" stroke="#252525" stroke-width="0.35"/>
+  <rect id="map-frame" data-role="map-frame" x="20" y="44" width="302" height="216" fill="#FFFFFF" stroke="none"/>
+  <text x="171" y="153" text-anchor="middle" fill="#A0A0A0" font-family="Arial, Helvetica, sans-serif" font-size="5">MAP FRAME — REPLACE WITH LINKED BASE AND THEME ARTWORK</text>
+  <text x="330" y="50" fill="#252525" font-family="Arial, Helvetica, sans-serif" font-size="4.5" font-weight="700">LEGEND</text>
+  <line x1="330" y1="54" x2="400" y2="54" stroke="#888888" stroke-width="0.25"/>
+  <text x="330" y="66" fill="#888888" font-family="Arial, Helvetica, sans-serif" font-size="3.5">Add theme keys and labels here.</text>
+  <line x1="330" y1="225" x2="400" y2="225" stroke="#888888" stroke-width="0.25"/>
+  <text x="330" y="234" fill="#888888" font-family="Arial, Helvetica, sans-serif" font-size="3.5">Add measured scale bar here.</text>
+  <text x="330" y="245" fill="#888888" font-family="Arial, Helvetica, sans-serif" font-size="3.5">Add north arrow here.</text>
+  <line x1="20" y1="266" x2="400" y2="266" stroke="#252525" stroke-width="0.25"/>
+  <text x="20" y="274" fill="#666666" font-family="Arial, Helvetica, sans-serif" font-size="3">SOURCE / RELEASE / DATE — COMPLETE FOR THIS MAP SET</text>
+  <text x="400" y="274" text-anchor="end" fill="#666666" font-family="Arial, Helvetica, sans-serif" font-size="3">BOARD NUMBER</text>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="56mm" height="12mm" viewBox="0 0 56 12" role="img" aria-labelledby="title desc">
+  <title id="title">Sample scale bar</title>
+  <desc id="desc">Example 500 metre scale bar at 1:10,000. Recalculate segment lengths and labels for the selected map scale.</desc>
+  <g data-example-scale-denominator="10000" data-example-ground-length-m="500">
+    <rect x="2" y="2" width="12.5" height="3" fill="#404040"/>
+    <rect x="14.5" y="2" width="12.5" height="3" fill="#FFFFFF"/>
+    <rect x="27" y="2" width="12.5" height="3" fill="#404040"/>
+    <rect x="39.5" y="2" width="12.5" height="3" fill="#FFFFFF"/>
+    <rect x="2" y="2" width="50" height="3" fill="none" stroke="#404040" stroke-width="0.25" vector-effect="non-scaling-stroke"/>
+    <path d="M14.5 2 V5 M27 2 V5 M39.5 2 V5" fill="none" stroke="#404040" stroke-width="0.2" vector-effect="non-scaling-stroke"/>
+    <text x="2" y="9" fill="#252525" font-family="Arial, Helvetica, sans-serif" font-size="2.8">0</text>
+    <text x="27" y="9" text-anchor="middle" fill="#252525" font-family="Arial, Helvetica, sans-serif" font-size="2.8">250</text>
+    <text x="52" y="9" text-anchor="end" fill="#252525" font-family="Arial, Helvetica, sans-serif" font-size="2.8">500 m</text>
+  </g>
+</svg>

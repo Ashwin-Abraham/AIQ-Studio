@@ -1,0 +1,12 @@
+{
+  "name": "aiq-studio",
+  "description": "AIQ Studio tools for AEC workflows",
+  "owner": {"name": "AIQ Studio"},
+  "plugins": [
+    {
+      "name": "aiq-site-tools",
+      "source": "./plugins/aiq-site-tools",
+      "description": "Create Rhino site data models and vector site analysis maps."
+    }
+  ]
+}

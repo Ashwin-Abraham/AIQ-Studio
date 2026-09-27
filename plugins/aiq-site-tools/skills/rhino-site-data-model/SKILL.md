@@ -21,10 +21,10 @@ Create a reproducible `.3dm` site model with source geometry, optional 3D conten
 
 ## Project guidance
 
-- Read [subagent delegation guidance](../../SUBAGENT-DELEGATION-GUIDANCE.md) before you delegate work.
-- Read [Rhino document editing guidance](../../RHINO-DOCUMENT-EDITING-GUIDANCE.md) before you select an editing method or change a Rhino document. Follow its rules for progressive edits, document identity, progress display, cancellation, undo, and saving.
-- Read [Python scripting guidance](../../PYTHON-SCRIPTING-GUIDANCE.md) before you create or adapt Python scripts, manage dependencies, or select a runtime environment.
-- Read [project folder organisation](../../PROJECT-FOLDER-ORGANISATION.md) before you create project folders or place models, source data, processed data, reports, scripts, or exports.
+- Read [subagent delegation guidance](references/SUBAGENT-DELEGATION-GUIDANCE.md) before you delegate work.
+- Read [Rhino document editing guidance](references/RHINO-DOCUMENT-EDITING-GUIDANCE.md) before you select an editing method or change a Rhino document. Follow its rules for progressive edits, document identity, progress display, cancellation, undo, and saving.
+- Read [Python scripting guidance](references/PYTHON-SCRIPTING-GUIDANCE.md) before you create or adapt Python scripts, manage dependencies, or select a runtime environment.
+- Read [project folder organisation](references/PROJECT-FOLDER-ORGANISATION.md) before you create project folders or place models, source data, processed data, reports, scripts, or exports.
 
 ## Workflow
 

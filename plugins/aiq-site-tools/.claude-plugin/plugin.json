@@ -1,0 +1,6 @@
+{
+  "name": "aiq-site-tools",
+  "version": "0.1.0",
+  "description": "Create Rhino site data models and vector site analysis maps.",
+  "author": {"name": "AIQ Studio"}
+}
