@@ -47,22 +47,30 @@ This example uses the Thames Wharf site in Poplar, London. The site model joins 
 
 ### 1. Review the Rhino site model
 
-The images below show the same elevated Rhino view. Layer visibility and display mode change to show each part of the model.
+These close views use the same elevated Rhino camera. Layer visibility and display mode change to show each part of the model.
 
-![Rhino view of the full Thames Wharf site model, with buildings, streets, land and water](docs/images/poplar/model-context.png)
+![Close Rhino view of the Thames Wharf site model, with building volumes beside the river](docs/images/poplar/model-context.png)
 
 | Building volumes and terrain | Streets, land and water with buildings hidden |
 | :---: | :---: |
 | [![Rhino view of building volumes and terrain](docs/images/poplar/model-buildings.png)](docs/images/poplar/model-buildings.png) | [![Rhino view of streets, land and water](docs/images/poplar/model-landscape.png)](docs/images/poplar/model-landscape.png) |
 
+The GIF shows the landscape layers, the full context, and the building volumes from this same view.
+
+![GIF showing three layer states of the close Rhino site view](docs/images/poplar/model-layer-reveal.gif)
+
 ### 2. Make vector site maps
 
-The map workflow uses one checked 2D source and one shared map frame. It makes editable SVG boards for figure ground, green structure, and blue structure. Select a map to open the full SVG.
+The map workflow uses one checked 2D source and one shared map frame. The base map gives each board the same buildings, streets, and water context.
+
+![Shared base map for the Thames Wharf site analysis boards](docs/images/poplar/Base_Map.svg)
+
+The workflow makes editable SVG boards for figure ground, green structure, and blue structure. Select a map to open the full SVG.
 
 | Figure ground | Green structure | Blue structure |
 | :---: | :---: | :---: |
 | [![Figure ground map of Thames Wharf](docs/images/poplar/Figure_ground.svg)](docs/images/poplar/Figure_ground.svg) | [![Green structure map of Thames Wharf](docs/images/poplar/Green_structure.svg)](docs/images/poplar/Green_structure.svg) | [![Blue structure map of Thames Wharf](docs/images/poplar/Blue_structure.svg)](docs/images/poplar/Blue_structure.svg) |
 
-The export also includes the [shared base map](docs/images/poplar/Base_Map.svg) and the [three-board site analysis SVG](docs/images/poplar/Site_Analysis.svg). The workflow can save a review PDF. Native Illustrator files need an application that can save and check `.ai` files.
+The export also includes the [three-board site analysis SVG](docs/images/poplar/Site_Analysis.svg). The workflow can save a review PDF. Native Illustrator files need an application that can save and check `.ai` files.
 
 For release work, see the [package guide](docs/packaging.md).
