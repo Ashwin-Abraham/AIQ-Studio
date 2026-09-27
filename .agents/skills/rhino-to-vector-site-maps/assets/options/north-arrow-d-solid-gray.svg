@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="14mm" height="22mm" viewBox="0 0 14 22" role="img" aria-labelledby="title desc">
+  <title id="title">North arrow D — solid grey</title>
+  <desc id="desc">Solid grey north arrow with a central tail notch.</desc>
+  <text x="7" y="4.5" text-anchor="middle" fill="#555555" font-family="Arial, Helvetica, sans-serif" font-size="4.5" font-weight="700">N</text>
+  <path d="M7 6L12.5 20L7 16.6L1.5 20Z" fill="#555555"/>
+</svg>
