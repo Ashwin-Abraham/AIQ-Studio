@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="56mm" height="12mm" viewBox="0 0 56 12" role="img" aria-labelledby="title desc">
+  <title id="title">Scale bar D — linear downward ticks</title>
+  <desc id="desc">Minimal black 500 metre scale bar example at 1:10,000, with all ticks below the horizontal line.</desc>
+  <g data-example-scale-denominator="10000" data-example-ground-length-m="500" fill="none" stroke="#000000" vector-effect="non-scaling-stroke">
+    <path d="M2 2.5H52M2 2.5V6.5M27 2.5V6.5M52 2.5V6.5" stroke-width="0.35"/>
+    <path d="M14.5 2.5V4.75M39.5 2.5V4.75" stroke-width="0.25"/>
+  </g>
+  <g fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="2.8">
+    <text x="2" y="10">0</text>
+    <text x="27" y="10" text-anchor="middle">250</text>
+    <text x="52" y="10" text-anchor="end">500 m</text>
+  </g>
+</svg>

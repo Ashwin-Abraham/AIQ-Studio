@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="14mm" height="22mm" viewBox="0 0 14 22" role="img" aria-labelledby="title desc">
+  <title id="title">North arrow B — outline</title>
+  <desc id="desc">Outlined black-and-white north arrow.</desc>
+  <text x="7" y="4.5" text-anchor="middle" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="4.5" font-weight="700">N</text>
+  <path d="M7 6L12 20L7 17.2L2 20Z" fill="#FFFFFF" stroke="#000000" stroke-width="0.45" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+  <path d="M7 6V17.2" fill="none" stroke="#000000" stroke-width="0.3" vector-effect="non-scaling-stroke"/>
+</svg>
