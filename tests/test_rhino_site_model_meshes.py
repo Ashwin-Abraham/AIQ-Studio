@@ -11,7 +11,8 @@ import rhino3dm as r3d
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_PATH = (
     REPO_ROOT
-    / ".agents"
+    / "plugins"
+    / "aiq-site-tools"
     / "skills"
     / "rhino-site-data-model"
     / "scripts"

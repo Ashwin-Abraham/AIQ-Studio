@@ -5,8 +5,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(SCRIPTS_PATH))
 import rhino3dm as r3d
 from site_model.audit import DOCUMENT_KEYS, OWNER, audit_file, audit_model
 from site_model.contract import METADATA_CONTRACT

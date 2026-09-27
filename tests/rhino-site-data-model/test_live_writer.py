@@ -12,13 +12,14 @@ import io
 import json
 import os
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 import sys
 sys.dont_write_bytecode = True
 import tempfile
 import traceback
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(SCRIPTS_PATH))
 deps = os.environ.get("SITE_MODEL_RHINO_TEST_DEPS", str(Path(tempfile.gettempdir()) / "site-model-rhino-test-deps"))
 if Path(deps).exists() and sys.version_info[:2] == (3, 9):
     sys.path.insert(0, deps)

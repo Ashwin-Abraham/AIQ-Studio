@@ -3,6 +3,7 @@ import io
 import json
 import math
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 import sys
 import tempfile
 import unittest
@@ -11,7 +12,7 @@ from unittest import mock
 from shapely.geometry import box
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "derive_context.py"
+SCRIPT = SCRIPTS_PATH / "derive_context.py"
 SPEC = importlib.util.spec_from_file_location("derive_context", SCRIPT)
 derive_context = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(derive_context)

@@ -1,10 +1,11 @@
 import json
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 import sys
 import tempfile
 import threading
 import unittest
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+sys.path.insert(0,str(SCRIPTS_PATH))
 from download_overture import DEFAULT_TYPES, download_sources, validate_types
 from process_overture import _clip_to_context, normalize_features, process_sources
 from site_model.overture_types import SUPPORTED_FEATURE_TYPES

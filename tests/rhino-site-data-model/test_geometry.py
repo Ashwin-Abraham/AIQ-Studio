@@ -3,8 +3,9 @@ import json
 import sys
 import unittest
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 from unittest.mock import patch
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+sys.path.insert(0,str(SCRIPTS_PATH))
 from site_model.geometry import (prepare_stage, TerrainSampler, polygon_from_part,
                                  flat_mass, planar_fill, reference_ground)
 

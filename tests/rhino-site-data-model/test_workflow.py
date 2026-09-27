@@ -1,13 +1,14 @@
 import copy
 import json
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 import subprocess
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(SCRIPTS_PATH))
 import rhino3dm as r3d
 from site_model.contract import atomic_json, file_sha256, load_json
 from site_model.workflow import run, migrate
@@ -162,7 +163,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("terrain", load_json(old))
 
     def test_cli_build_and_audit(self):
-        entry = Path(__file__).resolve().parents[1] / "scripts/run_site_model.py"
+        entry = SCRIPTS_PATH / "run_site_model.py"
         base = [sys.executable, "-B", str(entry), "--project-root", str(self.root), "--output", str(self.output), "--stage", "2d"]
         result = subprocess.run(base + ["--input", str(self.source), "--backend", "file"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)

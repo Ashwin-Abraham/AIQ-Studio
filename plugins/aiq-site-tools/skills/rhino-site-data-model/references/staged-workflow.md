@@ -10,15 +10,15 @@ The shared sources are independent of terrain. Both 2D and 3D preparation read t
 - `workflow.py` controls stage order, preparation workers, saves, and checkpoints.
 - `audit.py` checks saved geometry for the selected stage.
 
-Independent source acquisition, terrain downloads, and geometry preparation can use workers or sub-agents. Give each sub-agent a separate output path and a bounded theme or partition. Use the same release, CRS, and origin. Keep document changes, saves, and checkpoint updates under one writer. `--workers` selects preparation workers; it does not start Codex sub-agents.
+Independent source acquisition, terrain downloads, and geometry preparation can use workers or sub-agents. Give each sub-agent a separate output path and a bounded theme or partition. Use the same release, CRS, and origin. Keep document changes, saves, and checkpoint updates under one writer. `--workers` selects preparation workers; it does not start agent sub-agents.
 
-Geometry preparation accepts 1 to 8 workers. For parallel preparation inside Rhino, set `--worker-python` to the managed external Python executable selected under [Python scripting guidance](../../../PYTHON-SCRIPTING-GUIDANCE.md). That environment must have the script dependencies. Do not use Rhino's host executable as a Python worker. Use `--partition-size` to bound the number of source features in each preparation job; it is separate from the writer's object `--batch-size`.
+Geometry preparation accepts 1 to 8 workers. For parallel preparation inside Rhino, set `--worker-python` to the managed external Python executable selected under [Python scripting guidance](PYTHON-SCRIPTING-GUIDANCE.md). That environment must have the script dependencies. Do not use Rhino's host executable as a Python worker. Use `--partition-size` to bound the number of source features in each preparation job; it is separate from the writer's object `--batch-size`.
 
 The workflow checks the selected worker from inside the Rhino execution context before it opens a writer transaction. A path that exists for the host shell can still be unavailable to Rhino. The preflight must start the worker and import the geometry dependencies. If the preflight fails, do not create an undo record or change the document.
 
 ## Live document
 
-Use the default `live` backend inside Rhino Python. Before the run, create and open the target file if needed. Capture the open target and check its path, serial number, saved state, units, and frame as required by [Rhino document editing guidance](../../../RHINO-DOCUMENT-EDITING-GUIDANCE.md). The command does not replace this setup.
+Use the default `live` backend inside Rhino Python. Before the run, create and open the target file if needed. Capture the open target and check its path, serial number, saved state, units, and frame as required by [Rhino document editing guidance](RHINO-DOCUMENT-EDITING-GUIDANCE.md). The command does not replace this setup.
 
 The live writer must save the open target through `RhinoDoc.WriteFile` with suppressed input and document-path updates enabled. Rhino owns temporary-file handling, backup creation, locking, and unlocking for an open document. Do not write a temporary file and call `os.replace` over the open target. The file writer remains the only adapter that uses same-directory temporary replacement.
 

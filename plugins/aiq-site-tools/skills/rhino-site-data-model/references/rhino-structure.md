@@ -78,4 +78,3 @@ Use generic classes for layer names. Keep the exact source class, subtype, taxon
 - Drape ordinary surface roads and railways onto terrain for the 3D comparison branch.
 - Put unresolved bridges, tunnels, underground segments, and conflicting level rules in a separate unresolved layer. Do not infer their Z position.
 - Do not infer water elevation. A terrain-draped water curve is only a comparison geometry and must say so in metadata.
-

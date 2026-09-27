@@ -2,11 +2,12 @@
 
 import copy
 from pathlib import Path
+from _site_model_paths import SCRIPTS_PATH
 import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+sys.path.insert(0, str(SCRIPTS_PATH))
 from site_model.contract import (CONTRACT_VERSION, atomic_json, check_checkpoint, confined_path,
                                  file_sha256, load_json, source_digest,
                                  validate_sources, validate_terrain)
