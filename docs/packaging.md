@@ -1,15 +1,13 @@
 # Maintain the AIQ Site Tools package
 
-The maintained skills are in `.agents/skills/`. The packaged copies are in `plugins/aiq-site-tools/skills/`. Change the maintained skills, then run `python scripts/build_site_tools.py`. Run `python scripts/build_site_tools.py --check` before a release. The build includes required guidance and the image capture helper. It keeps two skills visible to users.
+The skill instructions, references, scripts, and map templates live in `plugins/aiq-site-tools/skills/`. This is the maintained source and the installable package. The two small entries in `.agents/skills/` make these skills visible when an agent works in this repository. They point to the package and hold no workflow code.
 
-Keep the site model and map skills in one package. The map skill reads the site model data contract. The Codex marketplace is in `.agents/plugins/marketplace.json`; the Claude marketplace is in `.claude-plugin/marketplace.json`.
+The site model tests live in `tests/rhino-site-data-model/`. Run them with:
 
-Before a public release, select a licence and test installation on clean devices with Codex, Claude Code, and OpenCode. Test a live run in Rhino and check `.ai` output in the selected authoring application.
+```text
+python -B -m unittest discover -s tests/rhino-site-data-model -q
+```
 
-## Checks on 2026-09-27
+The Codex marketplace is in `.agents/plugins/marketplace.json`. The Claude marketplace is in `.claude-plugin/marketplace.json`. Both point to the same package. The OpenCode installer copies the package skills to a user's personal skills folder.
 
-- The package build matched its sources, and all local links in packaged Markdown resolved.
-- The Codex plugin validator passed. Both marketplace files and all plugin manifests parsed as JSON.
-- The OpenCode installer copied both skills to a temporary project. `opencode debug skill` found both.
-- The site model suite ran 82 tests: 72 passed and 10 live Rhino tests were skipped outside Rhino.
-- Claude Code was absent from the test device. The installed Codex CLI had no `plugin` command. Those install routes still need checks on supported versions.
+Before a public release, select a licence and test installation in Codex, Claude Code, and OpenCode. Test a live run in Rhino and check `.ai` output in the selected authoring application.

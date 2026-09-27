@@ -118,7 +118,7 @@ Use the open document's valid units, tolerances, axes, and georeferencing. Trans
 
 Restore the active view, projection, selection, layer states, and display settings after a temporary visual check. Do not save temporary review settings unless they are part of the requested result.
 
-For image capture, use the [rhino-image-capture skill](image-capture.md) and its reusable script. It captures images through the Rhino API for review, progress records, or other uses and restores temporary camera settings. It does not perform validation or connect an external process to Rhino.
+For image capture, use a Rhino API method that preserves the document and view state. Inspect the captured image when the task needs visual review.
 
 ## Validation
 
