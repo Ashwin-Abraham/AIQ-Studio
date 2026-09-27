@@ -2,34 +2,7 @@
 
 AIQ Studio provides AI workflows for architecture, engineering, and construction. **AIQ Site Tools** has two skills: one builds a Rhino site model, and one makes vector site analysis maps from its checked 2D data.
 
-## Install AIQ Site Tools
-
-You need Windows and Rhino 8 to build a live Rhino model. You also need internet access to get map data. See the [installation guide](docs/distribution.md) for the Python check and full setup steps.
-
-### Codex
-
-1. Open this repository as a project in the Codex app.
-2. Restart Codex. In the Plugins Directory, select **AIQ Studio**.
-3. Install **AIQ Site Tools** and start a new chat.
-
-### Claude Code
-
-Run these commands, then start a new Claude Code session:
-
-```text
-claude plugin marketplace add Ashwin-Abraham/AIQ-Studio
-claude plugin install aiq-site-tools@aiq-studio
-```
-
-### OpenCode
-
-Download or clone this repository. Open PowerShell in the repository folder and run:
-
-```powershell
-.\scripts\install_opencode_skills.ps1
-```
-
-Restart OpenCode after the script finishes.
+**Installation:** See the [AIQ Site Tools installation guide](docs/distribution.md).
 
 ## Start a site project
 
@@ -55,17 +28,9 @@ These close views use the same elevated Rhino camera. Layer visibility and displ
 | :---: | :---: |
 | [![Rhino view of building volumes and terrain](docs/images/poplar/model-buildings.png)](docs/images/poplar/model-buildings.png) | [![Rhino view of streets, land and water](docs/images/poplar/model-landscape.png)](docs/images/poplar/model-landscape.png) |
 
-The GIF shows the landscape layers, the full context, and the building volumes from this same view.
-
-![GIF showing three layer states of the close Rhino site view](docs/images/poplar/model-layer-reveal.gif)
-
 ### 2. Make vector site maps
 
-The map workflow uses one checked 2D source and one shared map frame. The base map gives each board the same buildings, streets, and water context.
-
-![Shared base map for the Thames Wharf site analysis boards](docs/images/poplar/Base_Map.svg)
-
-The workflow makes editable SVG boards for figure ground, green structure, and blue structure. Select a map to open the full SVG.
+The map workflow uses one checked 2D source and one shared map frame. Each SVG contains its base map and theme artwork. The boards show figure ground, green structure, and blue structure. Select a map to open the full SVG.
 
 | Figure ground | Green structure | Blue structure |
 | :---: | :---: | :---: |
