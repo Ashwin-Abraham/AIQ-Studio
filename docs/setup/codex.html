@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Open Codex with an AIQ Studio installation request.">
+  <title>Set up AIQ Studio in Codex</title>
+  <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      color: #253049;
+      background: #f3f5f9;
+      line-height: 1.6;
+    }
+    body { margin: 0; padding: 32px 20px; }
+    main {
+      max-width: 540px;
+      margin: 10vh auto;
+      padding: 36px;
+      border: 1px solid #d1d6e3;
+      border-radius: 18px;
+      background: #fff;
+    }
+    .brand { color: #58629e; font-weight: 700; letter-spacing: .08em; }
+    h1 { margin: 12px 0; font-size: clamp(1.7rem, 5vw, 2.3rem); line-height: 1.2; }
+    a { color: #465293; text-underline-offset: 3px; }
+    .button {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 8px;
+      background: #333c55;
+      color: #fff;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    a:focus-visible { outline: 3px solid #8291e0; outline-offset: 4px; }
+    .help { font-size: .9rem; }
+    @media (prefers-color-scheme: dark) {
+      :root { color: #e8ecf5; background: #171b25; }
+      main { background: #232a3a; border-color: #3d4760; }
+      .brand, a { color: #b8c2ff; }
+      .button { background: #58629e; color: #fff; }
+    }
+    @media (max-width: 480px) {
+      main { margin: 5vh auto; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">AIQ STUDIO</div>
+    <h1>Opening Codex&hellip;</h1>
+    <p id="status" role="status">Allow your browser to open the Codex desktop app if it asks.</p>
+    <p>When Codex opens, review the setup request and press <strong>Send</strong>.</p>
+    <p>If the app does not open, use the button below.</p>
+    <p><a id="open-codex" class="button" href="codex://threads/new">Open Codex</a></p>
+    <p class="help">Codex must be installed on this computer. You can also use the
+      <a href="https://github.com/Ashwin-Abraham/AIQ-Studio/blob/main/docs/distribution.md#install-in-codex">installation guide</a>.
+    </p>
+    <noscript><p>Enable JavaScript to include the setup request, or follow the installation guide.</p></noscript>
+  </main>
+  <script>
+    const setupPrompt =
+      "Help me install AIQ Site Tools from https://github.com/Ashwin-Abraham/AIQ-Studio " +
+      "through its Codex plugin marketplace. Read the repository installation guide, " +
+      "check my local setup, and help me complete installation. " +
+      "Keep my existing projects and unrelated app settings intact.";
+    const launchUrl = "codex://threads/new?prompt=" + encodeURIComponent(setupPrompt);
+    document.getElementById("open-codex").href = launchUrl;
+
+    // Make one launch attempt. The link remains available if the browser blocks it.
+    try {
+      window.location.replace(launchUrl);
+    } catch {
+      document.getElementById("status").textContent =
+        "Use Open Codex below to ask your browser to open the desktop app.";
+    }
+  </script>
+</body>
+</html>
