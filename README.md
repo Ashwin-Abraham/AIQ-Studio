@@ -4,14 +4,18 @@ AIQ Studio provides AI workflows for architecture, engineering, and construction
 
 ## Installation
 
+Prerequisite: An AI desktop app such as Codex, ChatGPT, Claude Code, or OpenCode. Click to install AIQ Studio into your desktop AI app.
+
 [![Codex](assets/installation/codex.png)](docs/distribution.md#install-in-codex) [![Claude Code](assets/installation/claude-code.png)](docs/distribution.md#install-in-claude-code) [![OpenCode](assets/installation/opencode.png)](docs/distribution.md#install-in-opencode)
 
 ## Workflows
 
 These examples use the Thames Wharf site in Poplar, London.
 
+*click to expand*
+
 <details>
-<summary><strong>Site model creation</strong></summary>
+<summary><h3>Site Model Creation</h3></summary>
 
 Give the agent a site boundary or an existing Rhino model, and a project folder. For example:
 
@@ -32,7 +36,7 @@ The `.3dm` model has 344 layers of site data. The wide view shows the model and 
 </details>
 
 <details>
-<summary><strong>Site Analysis creation</strong></summary>
+<summary><h3>Site Analysis Creation</h3></summary>
 
 Use the checked site model for the map workflow:
 
