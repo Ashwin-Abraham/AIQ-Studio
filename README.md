@@ -2,7 +2,9 @@
 
 AIQ Studio provides AI workflows for architecture, engineering, and construction. **AIQ Site Tools** has two skills: one builds a Rhino site model, and one makes vector site analysis maps from its checked 2D data.
 
-**Installation:** See the [AIQ Site Tools installation guide](docs/distribution.md).
+## Installation
+
+[![Set up in Codex](https://img.shields.io/badge/Set_up_in-Codex-111827?style=for-the-badge)](docs/distribution.md#install-in-codex) [![Set up in Claude Code](https://img.shields.io/badge/Set_up_in-Claude_Code-D97757?style=for-the-badge)](docs/distribution.md#install-in-claude-code) [![Set up OpenCode](https://img.shields.io/badge/Set_up-OpenCode-374151?style=for-the-badge)](docs/distribution.md#install-in-opencode)
 
 ## Start a site project
 
