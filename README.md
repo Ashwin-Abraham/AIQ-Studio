@@ -4,7 +4,7 @@ AIQ Studio provides AI workflows for architecture, engineering, and construction
 
 ## Installation
 
-[![Set up in Codex](https://img.shields.io/badge/Set_up_in-Codex-111827?style=for-the-badge)](docs/distribution.md#install-in-codex) [![Set up in Claude Code](https://img.shields.io/badge/Set_up_in-Claude_Code-D97757?style=for-the-badge)](docs/distribution.md#install-in-claude-code) [![Set up OpenCode](https://img.shields.io/badge/Set_up-OpenCode-374151?style=for-the-badge)](docs/distribution.md#install-in-opencode)
+[!(https://img.shields.io/badge/Set_up_in-Codex-111827?style=for-the-badge)](docs/distribution.md#install-in-codex) [![Set up in Claude Code](https://img.shields.io/badge/Set_up_in-Claude_Code-D97757?style=for-the-badge)](docs/distribution.md#install-in-claude-code) [![Set up OpenCode](https://img.shields.io/badge/Set_up-OpenCode-374151?style=for-the-badge)](docs/distribution.md#install-in-opencode)
 
 ## Start a site project
 
