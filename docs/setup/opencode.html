@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Open OpenCode and copy an AIQ Studio installation request.">
+  <title>Set up AIQ Studio in OpenCode</title>
+  <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      color: #253049;
+      background: #f3f5f9;
+      line-height: 1.6;
+    }
+    body { margin: 0; padding: 32px 20px; }
+    main {
+      max-width: 540px;
+      margin: 10vh auto;
+      padding: 36px;
+      border: 1px solid #d1d6e3;
+      border-radius: 18px;
+      background: #fff;
+    }
+    .brand { color: #58629e; font-weight: 700; letter-spacing: .08em; }
+    h1 { margin: 12px 0; font-size: clamp(1.7rem, 5vw, 2.3rem); line-height: 1.2; }
+    a { color: #465293; text-underline-offset: 3px; }
+    .button {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 8px;
+      background: #333c55;
+      color: #fff;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    button, textarea { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #8291e0; border-radius: 8px; color: inherit; background: transparent; }
+    a:focus-visible, button:focus-visible, textarea:focus-visible { outline: 3px solid #8291e0; outline-offset: 4px; }
+    .help { font-size: .9rem; }
+    @media (prefers-color-scheme: dark) {
+      :root { color: #e8ecf5; background: #171b25; }
+      main { background: #232a3a; border-color: #3d4760; }
+      .brand, a { color: #b8c2ff; }
+      .button { background: #58629e; color: #fff; }
+    }
+    @media (max-width: 480px) {
+      main { margin: 5vh auto; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">AIQ STUDIO</div>
+    <h1>Opening OpenCode&hellip;</h1>
+    <p id="status" role="status">Allow your browser to open the OpenCode desktop app if it asks.</p>
+    <p>Copy the setup request below. In OpenCode, select a project folder, start a new chat, paste the request, and send it.</p>
+    <p class="help">OpenCode needs a local folder path to open a new chat with a prepared request. This website cannot determine that path.</p>
+    <p><a id="open-opencode" class="button" href="opencode://">Open OpenCode</a></p>
+    <label for="setup-request">Setup request</label>
+    <textarea id="setup-request" rows="7" readonly>Help me install AIQ Site Tools from https://github.com/Ashwin-Abraham/AIQ-Studio for OpenCode. Read the repository installation guide, check my local setup, and help me install both skills in my personal OpenCode skills folder. Keep my existing projects and unrelated app settings intact.</textarea>
+    <p><button id="copy-request" class="button" type="button">Copy setup request</button></p>
+    <p id="copy-status" role="status"></p>
+    <p class="help">OpenCode Desktop must be installed on this computer. You can also use the
+      <a href="https://github.com/Ashwin-Abraham/AIQ-Studio/blob/main/docs/distribution.md#install-in-opencode">installation guide</a>.
+    </p>
+    <noscript><p>Use Open OpenCode above and copy the setup request by hand.</p></noscript>
+  </main>
+  <script>
+    const requestField = document.getElementById("setup-request");
+    document.getElementById("copy-request").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(requestField.value);
+        document.getElementById("copy-status").textContent = "Copied. Paste the request into a new OpenCode chat.";
+      } catch {
+        requestField.focus();
+        requestField.select();
+        document.getElementById("copy-status").textContent = "Copy the selected request, then paste it into OpenCode.";
+      }
+    });
+
+    // Make one launch attempt. The link remains available if the browser blocks it.
+    try {
+      window.location.replace(document.getElementById("open-opencode").href);
+    } catch {
+      document.getElementById("status").textContent =
+        "Use Open OpenCode above to ask your browser to open the desktop app.";
+    }
+  </script>
+</body>
+</html>
