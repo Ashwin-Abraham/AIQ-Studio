@@ -6,7 +6,7 @@ AIQ Studio provides AI workflows for architecture, engineering, and construction
 
 Prerequisite: An AI desktop app such as Codex, ChatGPT, Claude Code, or OpenCode. Click to install AIQ Studio into your desktop AI app.
 
-[![Codex](assets/installation/codex.png)](docs/distribution.md#install-in-codex) [![Claude Code](assets/installation/claude-code.png)](docs/distribution.md#install-in-claude-code) [![OpenCode](assets/installation/opencode.png)](docs/distribution.md#install-in-opencode)
+[![Codex](assets/installation/codex.png)](https://ashwin-abraham.github.io/AIQ-Studio/setup/codex.html) [![Claude Code](assets/installation/claude-code.png)](docs/distribution.md#install-in-claude-code) [![OpenCode](assets/installation/opencode.png)](docs/distribution.md#install-in-opencode)
 
 ## Workflows
 
