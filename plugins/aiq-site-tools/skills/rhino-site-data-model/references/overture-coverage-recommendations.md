@@ -1,6 +1,6 @@
 # Overture coverage recommendations
 
-Reviewed against Overture Maps schema v2.0.0 on 18 September 2026.
+Reviewed against Overture Maps schema v2.0.0 on 3 October 2026. This review distinguishes workflow support from data present in a saved project. Use the schema associated with the project's release when processing its data.
 
 ## Current coverage
 
@@ -42,3 +42,9 @@ Keep `land`, `land_cover`, and `land_use` separate. They describe physical featu
 - [Buildings theme](https://docs.overturemaps.org/guides/buildings/)
 - [Transportation theme](https://docs.overturemaps.org/guides/transportation/)
 - [Places theme](https://docs.overturemaps.org/guides/places/)
+- [Building fields](https://docs.overturemaps.org/schema/reference/buildings/building/)
+- [Building part fields and parent reference](https://docs.overturemaps.org/schema/reference/buildings/building_part/)
+- [Building classes](https://docs.overturemaps.org/schema/reference/buildings/types/building_class/)
+- [Land-use classes](https://docs.overturemaps.org/schema/reference/base/types/land_use_class/)
+- [Land-cover fields](https://docs.overturemaps.org/schema/reference/base/land_cover/)
+- [Places fields](https://docs.overturemaps.org/schema/reference/places/place/)
