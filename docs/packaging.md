@@ -1,6 +1,8 @@
 # Maintain the AIQ Site Tools package
 
-The skill instructions, references, scripts, and map templates live in `plugins/aiq-site-tools/skills/`. This is the maintained source and the installable package. The two small entries in `.agents/skills/` make these skills visible when an agent works in this repository. They point to the package and hold no workflow code.
+The skill instructions, references, scripts, and map templates live in `plugins/aiq-site-tools/skills/`. This is the maintained source and the installable package. The small entries in `.agents/skills/` make these skills visible when an agent works in this repository. They point to the package and hold no workflow code.
+
+The `ladybug-install` skill manages Ladybug runtime setup. The `ladybug-analysis` skill runs radiation, seasonal shadow, and isovist analyses. It reads the installation skill only when the required setup is unavailable or incompatible. These are agent instructions; analysis scripts are created for the selected project under the shared Python guidance.
 
 The site model tests live in `tests/rhino-site-data-model/`. Run them with:
 
