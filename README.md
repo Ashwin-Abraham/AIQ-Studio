@@ -48,11 +48,11 @@ Use the checked site model for the map workflow:
 
 ### Sample outputs
 
-The editable SVG maps share one frame. Each map contains its base map and one theme: figure ground, green structure, or blue structure.
+The editable SVG maps share one frame. Each map contains its base map and one theme: figure ground, Vegetation and Open Space, or Water Features.
 
-| Figure ground | Green structure | Blue structure |
+| Figure ground | Vegetation and Open Space | Water Features |
 | :---: | :---: | :---: |
-| [![Figure ground map of Thames Wharf](docs/images/poplar/Figure_ground.svg)](docs/images/poplar/Figure_ground.svg) | [![Green structure map of Thames Wharf](docs/images/poplar/Green_structure.svg)](docs/images/poplar/Green_structure.svg) | [![Blue structure map of Thames Wharf](docs/images/poplar/Blue_structure.svg)](docs/images/poplar/Blue_structure.svg) |
+| [![Figure ground map of Thames Wharf](docs/images/poplar/Figure_ground.svg)](docs/images/poplar/Figure_ground.svg) | [![Vegetation and Open Space map of Thames Wharf](docs/images/poplar/Green_structure.svg)](docs/images/poplar/Green_structure.svg) | [![Water Features map of Thames Wharf](docs/images/poplar/Blue_structure.svg)](docs/images/poplar/Blue_structure.svg) |
 
 The export also includes the [three-board site analysis SVG](docs/images/poplar/Site_Analysis.svg). The workflow can save a review PDF. Native Illustrator files need an application that can save and check `.ai` files.
 

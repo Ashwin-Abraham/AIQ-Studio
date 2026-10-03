@@ -23,9 +23,26 @@ Save `map-config.json` with source path and hash, release, CRS, origin, persiste
 
 ## Maps to create
 
-Map detailed Overture and Rhino classes to the stable categories below. Show only layers present in the drawing.
+Read only the drawing specifications needed for the selected boards, plus the shared base map specification. Map detailed Overture and Rhino classes to their stable categories. Show only layers present in the drawing.
 
-Use the listed RGB hex colours as defaults. Record any project-specific overrides in `map-config.json`.
+Use the listed RGB hex colours as stable category defaults across projects. Record explicit project overrides in `map-config.json`.
+
+### Data coverage check
+
+Before drawing, compare the selected source with the fields required by each board. Resolve the Overture schema for the recorded release. Read the [Overture coverage review](../../rhino-site-data-model/references/overture-coverage-recommendations.md) when comparing workflow support with the dataset or diagnosing missing themes.
+
+Count unique `(feature_type, id)` records in the selected map extent. Count building parts separately from buildings. Deduplicate Rhino fills, outlines, and clipped pieces by source identity. Read properties from the processed source or retained 2D metadata, not from layer colours or derived 3D volumes.
+
+Record these results in `reports/validation.json` for each board:
+
+- Source, processed, and displayed feature counts where available; state the extent and denominator.
+- Required fields present, missing, invalid, or in conflict; separate source-height, floor-estimate, type-assumption, and unknown-height counts; classified and unknown building-use counts.
+- Required themes that were not acquired, were empty in the source, were rejected during processing, or have no display mapping. State `unverified` when the cache cannot establish the cause.
+- Unsupported classes and IDs, intentional exclusions, overlap decisions, and evidence needed to close each gap.
+
+The check is complete when each required theme and field has a status and each gap has a stated effect on the map. Keep a short coverage note on affected boards. Missing data does not mean that a physical feature or use is absent.
+
+### Shared drawing rules
 
 Use the layer hierarchy `Geometry / Category / Source class`. For example, `Area / Managed green` contains separate `Garden`, `Flowerbed`, `Allotment`, and `Managed grass` layers with the same colour. Preserve this hierarchy when saving to `.ai`.
 
@@ -33,7 +50,7 @@ Geometry controls the mark and primary paint order. Category controls the style.
 
 - Draw points as unfilled circles at a fixed print size.
 - Draw open curves as strokes in the colour used to fill the same class.
-- Fill closed curves and polygons. Preserve polygon holes.
+- Fill closed curves and polygons unless a theme specifies a transparent hatch or outline. Preserve polygon holes in fills and hatches.
 
 Assign and sort by explicit paint order before writing:
 
@@ -46,49 +63,45 @@ Assign and sort by explicit paint order before writing:
 7. Labels.
 8. Map furniture.
 
-Within one geometry band, the first listed category has the highest priority. In SVG, write frontmost objects last. In Illustrator, place frontmost layers higher in the Layers panel. Do not use source iteration order as paint order.
+Within one geometry band, use the theme's overlap rule. Where none is specified, the first listed category has the highest priority. Legend order does not override a theme's overlap rule. In SVG, write frontmost objects last. In Illustrator, place frontmost layers higher in the Layers panel. Do not use source iteration order as paint order.
 
 Do not merge overlapping `land`, `land_cover`, and `land_use` features automatically. Prefer detailed physical geometry over broad land cover, and draw designations as overlays. Use Places points for labels or symbols, not physical extent.
 
 ### Base map
 
-Create a light shared underlay. Keep theme emphasis in the analysis maps. Keep the linked base at full opacity; mute its internal colours instead.
-
-- `Buildings` — `#E3E0DA`.
-- `Transport` — `#D2CEC7`.
-- `Water` — `#D8E3E5`.
-- `Site boundary` — `#D95F4B`, 0.6 mm solid stroke at full opacity.
-- `Context boundary` — `#B8B8B8`.
-
-Use one source and style token for the site boundary. Repeat it above thematic artwork as a shared boundary overlay; do not restyle it per board.
+Read the [base map specification](base-map.md) when building the shared underlay.
 
 ### Figure-ground
 
-Fill `building` footprints with dark grey `#404040` and leave holes open. Use `building_part` only where its parent footprint is absent. Treat the unfilled map area as visual void, not public space.
+For a Figure-ground drawing, read its [specification](figure-ground.md).
 
-### Green structure
+### Vegetation and Open Space
 
-- `Canopy` — `#2F5D3A`: tree, tree row, wood, forest.
-- `Low vegetation` — `#78A85A`: grass, grassland, shrub, scrub, heath, meadow.
-- `Productive vegetation` — `#A5B85B`: farmland, crop, orchard, vineyard, plant nursery.
-- `Managed green` — `#B8D98A`: garden, flowerbed, allotment, managed grass.
-- `Recreation` — `#D3E6AF`: park, dog park, playground, pitch, recreation ground, golf green.
-- `Wetland` — `#5AAE9B`: wetland.
-- `Protected area` — `#5C7A4B`: nature reserve, national park, strict nature reserve, wilderness area, and other protected classes. Draw this as an outline or hatch over the physical cover.
+For a Vegetation and Open Space drawing, read its [specification](vegetation-and-open-space.md).
 
-### Blue structure
+### Water Features
 
-- `Open water` — `#6BAED6`: river, lake, pond, and water polygons.
-- `Watercourse` — `#1D5F91`: stream, river, and canal lines.
-- `Drainage` — `#56B4C2`: ditch and drain lines.
-- `Managed water` — `#8C9FD1`: basin, reservoir, dock, and swimming pool.
-- `Water infrastructure` — `#243B6B`: relevant dams, weirs, aqueducts, fountains, and water towers. Draw these as point or line symbols.
-- `Wetland` — `#5AAE9B`: wetland. Use the Green structure colour.
-- `Bathymetry` — `#DCEFF5`, `#A9D5E6`, `#6BAED6`, then `#1D5F91`: optional depth-threshold polygons from shallow to deep. Draw deeper thresholds above shallower ones; depth is not water-surface height.
+For a Water Features drawing, read its [specification](water-features.md).
 
-Water labels, landforms, and utilities do not receive water fills. Use a dashed or lighter stroke for intermittent water.
+### Building Height
 
-Place each unknown class on a hidden `Unmapped/<theme>/<class>` layer and list it in the validation report. Keep it out of the final artwork and review PDF. Use `#FF00FF` only in a separate QA view when requested. Keep conflicting sources separate.
+For a Building Height drawing, read its [specification](building-height.md).
+
+### Building Use
+
+For a Building Use drawing, read its [specification](building-use.md).
+
+### Detailed Building Use
+
+For a Detailed Building Use drawing, read its [specification](detailed-building-use.md).
+
+### Land Use
+
+For a Land Use drawing, read its [specification](land-use.md).
+
+### Natural Features
+
+For a Natural Features drawing, read its [specification](natural-features.md).
 
 ## Output structure
 
