@@ -1,0 +1,493 @@
+:root {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #243e38;
+  background: #f3f4ef;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1280px;
+  margin: auto;
+  padding: 36px 40px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+.file-button,
+select {
+  border: 1px solid #ccd5ca;
+  background: #fff;
+  color: #294d42;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+button:hover,
+.file-button:hover {
+  background: #eef2e9;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button[aria-pressed='true'],
+.primary {
+  background: #285b4b;
+  color: white;
+  border-color: #285b4b;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+.file-button:focus-within {
+  outline: 3px solid #b58a3d;
+  outline-offset: 3px;
+}
+h1 {
+  margin: 4px 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+h2 {
+  margin: 6px 0;
+  font-size: 23px;
+  font-weight: 500;
+}
+.eyebrow {
+  color: #6d7f72;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  font-weight: 700;
+  margin: 0;
+}
+.page-header,
+.chat-zone header,
+.workspace-heading,
+.canvas-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 14px;
+  font-size: 11px;
+  letter-spacing: 0;
+  background: #e5eadb;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.intro {
+  color: #748276;
+  margin: 12px 0 28px;
+}
+.base-picker {
+  background: white;
+  border: 1px solid #d8ddd3;
+  border-radius: 16px;
+  padding: 50px;
+  margin: 60px 0;
+}
+.base-choices {
+  display: flex;
+  gap: 16px;
+  margin: 32px 0 22px;
+  flex-wrap: wrap;
+}
+.file-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+small,
+.footnote {
+  color: #758174;
+  font-size: 12px;
+}
+.workspace {
+  border: 1px solid #d5dccf;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fcfcf7;
+}
+.workspace-heading {
+  padding: 14px 20px;
+  border-bottom: 1px solid #dde2d6;
+  font-size: 13px;
+}
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #5f8456;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.canvas-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+}
+.drawing-column {
+  min-width: 0;
+  background-image: radial-gradient(#d9ded3 0.7px, transparent 0.7px);
+  background-size: 18px 18px;
+}
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 16px;
+  flex-wrap: wrap;
+}
+.toolbar button {
+  padding: 7px 10px;
+  min-width: 48px;
+  font-size: 20px;
+}
+.toolbar small {
+  display: block;
+  font-size: 9px;
+  color: inherit;
+}
+.drawing-surface {
+  touch-action: none;
+}
+.canvas-caption {
+  padding: 12px 18px;
+  color: #8a9385;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.stage-panel {
+  padding: 28px 16px;
+  border-left: 1px solid #e0e4d9;
+  background: #f7f8f1;
+}
+.stage-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.stage-heading .eyebrow {
+  font-size: 9px;
+}
+.stage-heading button {
+  padding: 6px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.stage-entry {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 48px;
+  color: #7b897e;
+}
+.stage-capsule {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  border-radius: 24px;
+  padding: 2px 6px;
+}
+.stage-number {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 8px 4px;
+  font-size: 13px;
+}
+.stage-name {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  padding: 6px 3px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.stage-name:hover {
+  background: transparent;
+}
+.stage-entry input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  padding: 6px 3px;
+  cursor: text;
+  border-radius: 5px;
+}
+.stage-entry.current .stage-capsule {
+  background: #285b4b;
+  color: #fff;
+}
+.stage-entry.current .stage-number:hover {
+  background: #346c59;
+}
+.stage-delete {
+  padding: 3px 5px;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  font-size: 18px;
+}
+.stage-entry:hover .stage-delete,
+.stage-entry:focus-within .stage-delete {
+  opacity: 1;
+}
+@media (hover: none) {
+  .stage-delete {
+    opacity: 1;
+  }
+}
+.stage-dialog {
+  width: min(380px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid #ccd5ca;
+  border-radius: 16px;
+  color: #243e38;
+}
+.stage-dialog::backdrop {
+  background: rgb(25 40 34 / 35%);
+}
+.stage-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.stage-dialog p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.dialog-actions button {
+  font-size: 13px;
+}
+.drawing-surface.tool-select {
+  cursor: default;
+}
+.drawing-surface.tool-erase {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='38' viewBox='0 0 28 38'%3E%3Cg transform='rotate(18 14 19)'%3E%3Crect x='7' y='3' width='14' height='32' rx='2' fill='white' stroke='%23284d42' stroke-width='2'/%3E%3Cpath d='M7 23H21V33Q21 35 19 35H9Q7 35 7 33Z' fill='%23284d42'/%3E%3C/g%3E%3C/svg%3E")
+      9 32,
+    crosshair;
+}
+.chat-option-selector {
+  display: block;
+  margin-top: 12px;
+}
+.chat-zone form input,
+.chat-zone form button {
+  font-size: 13px;
+}
+.options-bar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 12px 20px;
+  border-top: 1px solid #dce2d4;
+  background: #fff;
+}
+.options-bar nav {
+  display: flex;
+  gap: 8px;
+}
+label {
+  font-size: 13px;
+}
+input[type='checkbox'] {
+  accent-color: #285b4b;
+}
+.layer-bar {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 0;
+  flex-wrap: wrap;
+}
+.compact {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+.chat-zone {
+  background: white;
+  border: 1px solid #d5dccf;
+  border-radius: 14px;
+  padding: 24px;
+}
+.chat-zone select {
+  margin-left: 8px;
+}
+.messages {
+  min-height: 120px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 16px 0;
+}
+.system-note {
+  font-size: 12px;
+  color: #7c8777;
+}
+.empty-note {
+  color: #8b9487;
+  font-size: 14px;
+}
+.user-message {
+  background: #eef2e9;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-left: 15%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+form {
+  display: flex;
+  gap: 12px;
+}
+form input,
+.text-label input {
+  border: 1px solid #d4ddcc;
+  border-radius: 8px;
+  padding: 13px 16px;
+  min-width: 0;
+  flex: 1;
+  background: #fafbf7;
+}
+.text-label {
+  display: block;
+  padding: 0 16px 12px;
+}
+.footnote {
+  text-align: right;
+}
+.error {
+  color: #9a3434;
+  padding: 16px;
+  background: #fbe9e5;
+  border-radius: 8px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 760px) {
+  main {
+    padding: 20px 14px;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .canvas-area {
+    grid-template-columns: minmax(0, 1fr) 175px;
+  }
+  .stage-panel {
+    padding: 20px 8px;
+  }
+  .page-header,
+  .chat-zone header,
+  .options-bar {
+    flex-wrap: wrap;
+  }
+  .layer-bar {
+    gap: 12px;
+  }
+  .base-picker {
+    padding: 24px;
+  }
+  .workspace-heading small {
+    display: none;
+  }
+}
+
+.tool-icon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+.fill-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 12px;
+}
+.fill-controls input {
+  width: 36px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.drawing-surface.tool-fill {
+  cursor: crosshair;
+}
+.export-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.export-row button {
+  font-size: 13px;
+}
+
+.eraser-icon {
+  height: 26px;
+  width: 20px;
+}
+.shape-properties {
+  cursor: default;
+}
+.drawing-surface:focus {
+  outline: none;
+}
+.drawing-surface:focus-visible {
+  outline: 2px solid #b88645;
+  outline-offset: -2px;
+}
+
+.drawing-surface.tool-copy {
+  cursor: copy;
+}
+
+.trash-icon {
+  width: 17px;
+  height: 19px;
+  display: block;
+}
