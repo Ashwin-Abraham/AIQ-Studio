@@ -105,11 +105,15 @@ For a Natural Features drawing, read its [specification](natural-features.md).
 
 ### Radiation
 
-For a Radiation drawing, read the [calculation and drawing workflow](radiation.md). It defines the analysis inputs, project scripts, and continuous gradient legend.
+For a Radiation drawing, read the [calculation and drawing workflow](radiation.md). It defines the coloured cells and continuous gradient legend.
 
 ### Isovist
 
-For an Isovist drawing, read the [calculation and drawing workflow](isovist.md). It defines observation heights, project scripts, and visible-area polygons.
+For an Isovist drawing, read the [calculation and drawing workflow](isovist.md). It defines observation markers, heights, and visible-area polygons.
+
+### Seasonal Shadows
+
+For seasonal shadow drawings, read the [drawing specification](shadow.md). It defines sunlit and shaded areas and date/time labels.
 
 ## Output structure
 
