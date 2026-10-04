@@ -1,6 +1,6 @@
 # Radiance installation and repair
 
-Read this reference only when radiation setup needs a missing engine, a compatible version, or a configuration repair. Radiance is a separate native engine; installing `ladybug-radiance` does not install it. Shadow and isovist analysis in this workflow do not use Radiance.
+Use this reference for radiation setup checks and repairs. Radiance is a separate native engine; installing `ladybug-radiance` does not install it. For check-only requests, report missing components without installing them.
 
 ## Locate or install
 
@@ -33,4 +33,4 @@ The executable list comes from the [sky matrix implementation](https://www.ladyb
 
 Write the engine version, source, installation paths, required executables, check results, and time to the runtime record. Set Radiance status to `available` only when its availability checks pass. This status confirms dependency availability, not numerical accuracy or a tested simulation.
 
-If a required component remains unavailable, set status to `unavailable`, report the component and repair action, and stop the radiation run. Keep any working engine record intact. A Radiance failure does not block caller-selected shadow or isovist runs whose own dependencies are available. Do not start an analysis from installation alone.
+Return unresolved components and repair actions to Ladybug setup. Preserve working engine records when a replacement fails.
