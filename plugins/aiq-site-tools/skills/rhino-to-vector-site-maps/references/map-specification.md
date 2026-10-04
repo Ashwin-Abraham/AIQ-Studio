@@ -103,6 +103,14 @@ For a Land Use drawing, read its [specification](land-use.md).
 
 For a Natural Features drawing, read its [specification](natural-features.md).
 
+### Radiation
+
+For a Radiation drawing, read the [calculation and drawing workflow](radiation.md). It defines the analysis inputs, project scripts, and continuous gradient legend.
+
+### Isovist
+
+For an Isovist drawing, read the [calculation and drawing workflow](isovist.md). It defines observation heights, project scripts, and visible-area polygons.
+
 ## Output structure
 
 ```text

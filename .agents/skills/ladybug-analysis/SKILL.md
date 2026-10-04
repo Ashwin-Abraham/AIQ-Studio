@@ -1,6 +1,6 @@
 ---
 name: ladybug-analysis
-description: Run Ladybug radiation, seasonal shadow, or isovist analysis from caller-supplied Rhino geometry, layers, or observation points and heights. Also check whether the required Ladybug setup is available.
+description: Run Ladybug radiation, seasonal shadow, or isovist analysis from caller-supplied Rhino geometry, layers, or observation points and heights. Also check, install, or repair the required Python, Ladybug, and Radiance setup.
 ---
 
 # Ladybug analysis
