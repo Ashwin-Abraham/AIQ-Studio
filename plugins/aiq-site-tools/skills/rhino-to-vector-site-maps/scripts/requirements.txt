@@ -1,0 +1,2 @@
+shapely>=2.0,<3
+rhino3dm>=8,<9
