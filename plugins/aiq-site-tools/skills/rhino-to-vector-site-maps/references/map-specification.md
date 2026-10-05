@@ -95,6 +95,10 @@ For a Terrain Height drawing, read the [terrain workflow](terrain-analysis.md), 
 
 For a Terrain Slope drawing, read the [terrain workflow](terrain-analysis.md), then the [Rhino and SVG specification](terrain-slope.md).
 
+### Water Flow and Watersheds
+
+For one drawing with terrain flow lines and coloured watershed areas, read the [terrain workflow](terrain-analysis.md), then the [calculation and drawing specification](water-flow-and-watersheds.md).
+
 ### Building Use
 
 For a Building Use drawing, read its [specification](building-use.md).
