@@ -87,6 +87,14 @@ For a Water Features drawing, read its [specification](water-features.md).
 
 For a Building Height drawing, read its [specification](building-height.md).
 
+### Terrain Height
+
+For a Terrain Height drawing, read the [terrain workflow](terrain-analysis.md), then the [Rhino and SVG specification](terrain-height.md).
+
+### Terrain Slope
+
+For a Terrain Slope drawing, read the [terrain workflow](terrain-analysis.md), then the [Rhino and SVG specification](terrain-slope.md).
+
 ### Building Use
 
 For a Building Use drawing, read its [specification](building-use.md).
