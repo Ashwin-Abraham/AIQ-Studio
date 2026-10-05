@@ -1,6 +1,9 @@
 """Executable Rhino cartographic styles and semantic draw-order rules."""
 
 from dataclasses import dataclass
+from functools import lru_cache
+import json
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -37,12 +40,25 @@ _BUILDING = {
     "transportation": ((134, 160, 181), .25), "service": ((185, 185, 178), .13),
     "mixed": ((181, 158, 132), .20),
 }
-_ROAD = {
-    "motorway": ((69, 44, 32), .70, 99), "trunk": ((69, 44, 32), .70, 98),
-    "primary": ((104, 69, 47), .50, 90), "secondary": ((137, 103, 60), .35, 80),
-    "tertiary": ((153, 133, 76), .25, 70), "local": ((167, 155, 106), .18, 60),
-    "residential": ((167, 155, 106), .18, 60), "service": ((184, 178, 151), .13, 50),
-}
+TRANSPORT_STANDARD = Path(__file__).resolve().parents[4] / "standards/overture/transport.json"
+
+
+@lru_cache(maxsize=1)
+def _transport_styles():
+    return json.loads(TRANSPORT_STANDARD.read_text(encoding="utf-8"))["styles"]
+
+
+def transport_style(properties):
+    """Return shared Rhino/SVG style tokens; unknown classes stay explicit."""
+    subtype = str(properties.get("subtype") or "").lower()
+    class_name = str(properties.get("class") or "").lower()
+    styles = _transport_styles()
+    for style in styles:
+        if style["subtype"] == subtype and (
+            style["classes"] is None or class_name in style["classes"]
+        ):
+            return dict(style)
+    return dict(next(style for style in styles if style["id"] == "unknown"))
 
 
 def style_for(record=None, role=None, boundary=None):
@@ -77,11 +93,9 @@ def style_for(record=None, role=None, boundary=None):
         rgb, weight = _BUILDING.get(key, ((135, 135, 132), .18))
         return _style(rgb, weight, 70000)
     if kind == "segment":
-        if subtype == "rail":
-            major = class_name in ("rail", "main", "high_speed")
-            return _style((70, 48, 32) if major else (118, 92, 68), .50 if major else .25, 81000 if major else 80500)
-        rgb, weight, rank = _ROAD.get(class_name, ((111, 128, 105), .13, 10))
-        return _style(rgb, weight, 80000 + rank)
+        tokens = transport_style(properties)
+        rgb = tuple(int(tokens["color"][i:i + 2], 16) for i in (1, 3, 5))
+        return _style(rgb, tokens["width_mm"], tokens["draw_order"])
     if kind == "infrastructure":
         return _style((96, 105, 112), .25, 90000)
     if kind == "place":

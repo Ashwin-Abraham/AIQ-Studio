@@ -51,16 +51,7 @@ Draw sections in this order from bottom to top: bathymetry, land, land cover, la
 
 ## Transport
 
-| Layer type | RGB | Hex | Line weight (mm) |
-| --- | ---: | --- | ---: |
-| Motorway or trunk road | 69, 44, 32 | `#452C20` | 0.70 |
-| Primary road | 104, 69, 47 | `#68452F` | 0.50 |
-| Secondary road | 137, 103, 60 | `#89673C` | 0.35 |
-| Tertiary road | 153, 133, 76 | `#99854C` | 0.25 |
-| Local or residential road | 167, 155, 106 | `#A79B6A` | 0.18 |
-| Service road | 184, 178, 151 | `#B8B297` | 0.13 |
-| Major railway | 70, 48, 32 | `#463020` | 0.50 |
-| Minor railway or path | 118, 92, 68 | `#765C44` | 0.25 |
+For every transport segment, read the [shared Overture transport standard](../../../standards/overture/transport.md). Its JSON defines the class mapping, fallback, colour, paper width, line pattern, and draw order for both Rhino and SVG.
 
 ## Other layers
 
@@ -74,4 +65,4 @@ Draw sections in this order from bottom to top: bathymetry, land, land cover, la
 | Site boundary | 126, 53, 45 | `#7E352D` | 0.50 |
 | Unresolved or QA | 173, 43, 148 | `#AD2B94` | 0.35 |
 
-Use the Unclassified style for a source value that has no listed mapping.
+Use the Unclassified style for a source value that has no listed mapping. For transport segments, use the shared standard's explicit fallback.

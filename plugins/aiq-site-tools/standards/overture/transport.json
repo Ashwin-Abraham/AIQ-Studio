@@ -1,0 +1,162 @@
+{
+  "version": 2,
+  "styles": [
+    {
+      "id": "motorway",
+      "label": "Motorway / trunk",
+      "subtype": "road",
+      "classes": [
+        "motorway",
+        "trunk"
+      ],
+      "color": "#9E1B32",
+      "width_mm": 0.7,
+      "line_pattern": "solid",
+      "draw_order": 80099
+    },
+    {
+      "id": "primary",
+      "label": "Primary road",
+      "subtype": "road",
+      "classes": [
+        "primary"
+      ],
+      "color": "#C45A00",
+      "width_mm": 0.5,
+      "line_pattern": "solid",
+      "draw_order": 80090
+    },
+    {
+      "id": "secondary",
+      "label": "Secondary road",
+      "subtype": "road",
+      "classes": [
+        "secondary"
+      ],
+      "color": "#956B00",
+      "width_mm": 0.35,
+      "line_pattern": "solid",
+      "draw_order": 80080
+    },
+    {
+      "id": "tertiary",
+      "label": "Tertiary road",
+      "subtype": "road",
+      "classes": [
+        "tertiary"
+      ],
+      "color": "#706500",
+      "width_mm": 0.25,
+      "line_pattern": "solid",
+      "draw_order": 80070
+    },
+    {
+      "id": "local",
+      "label": "Local road",
+      "subtype": "road",
+      "classes": [
+        "residential",
+        "living_street",
+        "unclassified",
+        "local"
+      ],
+      "color": "#42658A",
+      "width_mm": 0.18,
+      "line_pattern": "solid",
+      "draw_order": 80060
+    },
+    {
+      "id": "service",
+      "label": "Service road",
+      "subtype": "road",
+      "classes": [
+        "service"
+      ],
+      "color": "#67727C",
+      "width_mm": 0.13,
+      "line_pattern": "solid",
+      "draw_order": 80050
+    },
+    {
+      "id": "path",
+      "label": "Path / walking route",
+      "subtype": "road",
+      "classes": [
+        "path",
+        "footway",
+        "pedestrian",
+        "steps",
+        "bridleway",
+        "track"
+      ],
+      "color": "#A13980",
+      "width_mm": 0.25,
+      "line_pattern": "solid",
+      "draw_order": 80020
+    },
+    {
+      "id": "cycleway",
+      "label": "Cycleway",
+      "subtype": "road",
+      "classes": [
+        "cycleway"
+      ],
+      "color": "#00754A",
+      "width_mm": 0.25,
+      "line_pattern": "solid",
+      "draw_order": 80030
+    },
+    {
+      "id": "rail",
+      "label": "Standard-gauge railway",
+      "subtype": "rail",
+      "classes": [
+        "standard_gauge",
+        "rail",
+        "main",
+        "high_speed"
+      ],
+      "color": "#3D238C",
+      "width_mm": 0.5,
+      "line_pattern": "solid",
+      "draw_order": 81000
+    },
+    {
+      "id": "other_rail",
+      "label": "Other railway",
+      "subtype": "rail",
+      "classes": [
+        "light_rail",
+        "subway",
+        "tram",
+        "monorail",
+        "narrow_gauge",
+        "funicular"
+      ],
+      "color": "#7042B5",
+      "width_mm": 0.25,
+      "line_pattern": "solid",
+      "draw_order": 80500
+    },
+    {
+      "id": "water_route",
+      "label": "Water transport route",
+      "subtype": "water",
+      "classes": null,
+      "color": "#007C9E",
+      "width_mm": 0.25,
+      "line_pattern": "solid",
+      "draw_order": 80015
+    },
+    {
+      "id": "unknown",
+      "label": "Unclassified transport",
+      "subtype": null,
+      "classes": null,
+      "color": "#555555",
+      "width_mm": 0.13,
+      "line_pattern": "solid",
+      "draw_order": 80010
+    }
+  ]
+}

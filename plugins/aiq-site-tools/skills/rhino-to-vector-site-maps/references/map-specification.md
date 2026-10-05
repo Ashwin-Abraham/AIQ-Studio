@@ -71,6 +71,10 @@ Do not merge overlapping `land`, `land_cover`, and `land_use` features automatic
 
 Read the [base map specification](base-map.md) when building the shared underlay.
 
+### Transport
+
+For a Transport drawing, read its [specification](transport.md). Use the [shared Overture transport standard](../../../standards/overture/transport.md) for Rhino and SVG styling.
+
 ### Figure-ground
 
 For a Figure-ground drawing, read its [specification](figure-ground.md).
