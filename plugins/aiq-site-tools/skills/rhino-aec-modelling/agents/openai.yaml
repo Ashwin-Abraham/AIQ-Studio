@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rhino AEC Modelling"
+  short_description: "Model urban concepts in Rhino with AIQ Urban"
+  default_prompt: "Use $rhino-aec-modelling to model this urban concept in Rhino with AIQ Urban."
