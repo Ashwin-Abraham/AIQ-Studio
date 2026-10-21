@@ -48,11 +48,27 @@ Use the checked site model for the map workflow:
 
 ### Sample outputs
 
-The editable SVG maps share one frame. Each map contains its base map and one theme: figure ground, Vegetation and Open Space, or Water Features.
+Each drawing contains its base map and one analysis theme. The examples below use the current Poplar map set, with the scale shown on each sheet.
 
 | Figure ground | Vegetation and Open Space | Water Features |
 | :---: | :---: | :---: |
 | [![Figure ground map of Thames Wharf](docs/images/poplar/Figure_ground.svg)](docs/images/poplar/Figure_ground.svg) | [![Vegetation and Open Space map of Thames Wharf](docs/images/poplar/Green_structure.svg)](docs/images/poplar/Green_structure.svg) | [![Water Features map of Thames Wharf](docs/images/poplar/Blue_structure.svg)](docs/images/poplar/Blue_structure.svg) |
+
+| Transport | Building Height | Building Use |
+| :---: | :---: | :---: |
+| [![Transport map of Thames Wharf](docs/images/poplar/Transport.png)](docs/images/poplar/Transport.png) | [![Building Height map of Thames Wharf](docs/images/poplar/Building_Height.png)](docs/images/poplar/Building_Height.png) | [![Building Use map of Thames Wharf](docs/images/poplar/Building_Use.png)](docs/images/poplar/Building_Use.png) |
+
+| Land Use | Natural Features | Terrain Height |
+| :---: | :---: | :---: |
+| [![Land Use map of Thames Wharf](docs/images/poplar/Land_Use.png)](docs/images/poplar/Land_Use.png) | [![Natural Features map of Thames Wharf](docs/images/poplar/Natural_Features.png)](docs/images/poplar/Natural_Features.png) | [![Terrain Height map of Thames Wharf](docs/images/poplar/Terrain_Height.png)](docs/images/poplar/Terrain_Height.png) |
+
+| Terrain Slope | Water Flow and Watersheds | Annual Roof Radiation |
+| :---: | :---: | :---: |
+| [![Terrain Slope map of Thames Wharf](docs/images/poplar/Terrain_Slope.png)](docs/images/poplar/Terrain_Slope.png) | [![Water Flow and Watersheds map of Thames Wharf](docs/images/poplar/Water_Flow_and_Watersheds.png)](docs/images/poplar/Water_Flow_and_Watersheds.png) | [![Annual Roof Radiation map of Thames Wharf](docs/images/poplar/Annual_Roof_Radiation.png)](docs/images/poplar/Annual_Roof_Radiation.png) |
+
+| Annual Ground Radiation | Isovist - 10 m | Summer Shadow - Noon |
+| :---: | :---: | :---: |
+| [![Annual Ground Radiation map of Thames Wharf](docs/images/poplar/Annual_Ground_Radiation.png)](docs/images/poplar/Annual_Ground_Radiation.png) | [![Isovist at 10 m above terrain at Thames Wharf](docs/images/poplar/Isovist_10m.png)](docs/images/poplar/Isovist_10m.png) | [![Summer shadow at Thames Wharf on 21 June 2026 at noon](docs/images/poplar/Summer_Noon_Shadow.png)](docs/images/poplar/Summer_Noon_Shadow.png) |
 
 The export also includes the [three-board site analysis SVG](docs/images/poplar/Site_Analysis.svg). The workflow can save a review PDF. Native Illustrator files need an application that can save and check `.ai` files.
 
