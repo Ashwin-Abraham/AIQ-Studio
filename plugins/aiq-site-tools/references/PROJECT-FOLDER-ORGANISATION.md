@@ -9,7 +9,9 @@ For a new project, use this layout as a starting point. Create a folder when wor
 ```text
 <project>/
 ├── project.json                    Paths and current project status
+├── workflow.html                   Read-only view of the project record
 ├── project-log.md                  Dated changes and decisions
+├── .agents/                        Project-local agent instructions and helpers, if needed
 ├── 01_Admin/
 │   ├── brief/
 │   ├── programme/
@@ -55,6 +57,8 @@ For a new project, use this layout as a starting point. Create a folder when wor
 ```
 
 Keep each design option together. Add its stage folders as work progresses; use the project's actual stage names. Record a short vision and stage summary in the option's `overview.md`. Record dated changes in `project-log.md` and point to the active option and stage from `project.json`.
+
+Keep the stage record in `project.json` and generate `workflow.html` beside it with the [project workflow renderer](PROJECT-WORKFLOW.md). Use `.agents/` only for project-local agent material that has no place in a work area. A project can start without this folder.
 
 ## Where files go
 
