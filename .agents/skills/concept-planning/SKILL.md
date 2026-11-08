@@ -1,6 +1,6 @@
 ---
 name: concept-planning
-description: Develop or revise site and architectural concepts through a driving vision, parti diagrams, rough spatial planning, zoning and massing, with review and iteration between stages. Use for concept planning and early design refinement.
+description: Develop or revise site and architectural concepts through a driving vision, parti, rough spatial plan, zoning and massing, with review between stages. Use for concept planning and early design refinement.
 ---
 
 # Concept planning

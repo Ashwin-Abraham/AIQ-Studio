@@ -1,20 +1,16 @@
 ---
 name: concept-planning
-description: Develop or revise site and architectural concepts through a driving vision, parti diagrams, rough spatial planning, zoning and massing, with review and iteration between stages. Use for concept planning and early design refinement.
+description: Develop or revise site and architectural concepts through a driving vision, parti, rough spatial plan, zoning and massing, with review between stages. Use for concept planning and early design refinement.
 ---
 
-# A note on concept planning
+# Concept planning
 
-Conceptual planning involves first having a simple driving vision based on an aesthetic/cultural idea or in response to something on site or ideally both. This is typically explained in a parti diagram which captures the essence of the vision in a simple drawing or set of drawings. It tends to be more qualitative than quantitative.
+Read the [designer's note](references/design-note.md) for the reasoning behind this sequence.
 
-Based on this the next level of refinement of a concept is a little more quantitative, where we try to fit bubbles or masses of a VERY rough size and shape onto a site. Axes of movement of both site users, ecological flows and other prominent constraints… like say a buffer zone should be considered in this stage. Movements and functions are thus placed at this point. Typical tools are a bubble diagram or a massing model while keeping the original concept in mind. At this stage we are trying to get to approximately the right size with a large (maybe 10–25% error margin being acceptable). It is essential to resolve all primary axes of people and ecology as well as bubbles that have morphed into the zone's approximate form by the end of this step. Iteration over 2–3 diagrams is acceptable to achieve the final resolution from simple line and circle to more site geometry informed shapes.
+1. **Establish the basis.** Read the available Programme Brief, site data and project goals. Identify the site boundary, scale, major constraints and source of each. Record missing information as an assumption or open question. The basis is ready when the concept can be judged against a stated site and programme.
+2. **Form a vision and parti.** State one driving idea drawn from the site, a cultural or aesthetic reference, or both. Draw a simple parti that makes the idea visible. The parti is ready when its main spatial move can be explained without detailed zoning.
+3. **Test a rough spatial plan.** Place approximate programme areas as bubbles or masses. Show the main axes of movement for people and ecology, plus prominent constraints such as buffers. Check the intended scale and approximate capacity; a 10–25% size error may be acceptable here. Revise until the routes and principal zones have credible forms.
+4. **Develop the design.** Refine zoning for a masterplan, massing for architecture, or space planning for a floorplate. Let findings at one scale inform the others. Include parcel subdivision when the project needs it and its method is available in the project record.
+5. **Review and iterate.** After each step, compare the result with the vision, programme and site evidence. Return to an earlier step when a later one reveals a weak assumption or a better idea. Record the current option, its key decision, unresolved questions and next stage. When the user asks for a stronger concept, revisit the vision and parti before refining geometry.
 
-Then we go into zoning (masterplanning) or detailed massing (architecture) or space planning (floorplate design), sometimes all of these separately, but with one scale informing the other.
-
-Even though these are distinct steps, we always judge our work after each step and then often decide to go back to a prior step to refine an assumption or try a different approach. Because the initial stages are error prone and exploratory while the later stages may throw up new ideas and synergies. So a few iterations and revisions of going back and forth are always valuable.
-
-Also consider the subD stuff we discussed.
-
-Here, “subD” refers to parcel subdivision. Use the methods established in the project's prior discussion or design record.
-
-When revising an existing design: iterate on this design you made… rather start again with a stronger concept => parti / ref imagery => zoning => detailed zoning => massing approach.
+When saving work, follow [project folder organisation](../../references/PROJECT-FOLDER-ORGANISATION.md) and keep each option's diagrams and stage record together.
