@@ -6,6 +6,8 @@ An AEC workflow takes a project from stated needs and site evidence through desi
 
 | Skill | What it produces | How it fits |
 | --- | --- | --- |
+| [Project Setup](skills/project-setup/SKILL.md) | A project folder map, `project.json`, and a local workflow view. | Starts a project or records an existing layout. |
+| [Project Orchestrator](skills/project-orchestrator/SKILL.md) | Current stage summaries, decisions and file links in the manifest and HTML view. | Keeps the project record aligned with work. |
 | [Programme Brief](skills/programme-brief/SKILL.md) | A spreadsheet of uses, areas and capacities, with assumptions and sources. | Gives site and design work a measurable demand. |
 | [Rhino Site Data Model](skills/rhino-site-data-model/SKILL.md) | A checked Rhino site model, source data and validation report. | Gives design and analysis a shared site base. |
 | [Concept Planning](skills/concept-planning/SKILL.md) | A driving vision, parti, rough spatial plan, and refined zoning or massing approach. | Develops design options from the programme and site findings. |
@@ -17,4 +19,4 @@ The Programme Brief and site model can develop in parallel. Site maps and analys
 
 ## Start or resume a project
 
-Choose a project folder and read [project folder organisation](references/PROJECT-FOLDER-ORGANISATION.md). For a new project, create only the folders needed for the current work. For an existing project, record its folder paths in `project.json` and use those paths when a skill saves files. Keep the current option and stage in the manifest, a short account of each option in its `overview.md`, and dated decisions in `project-log.md`.
+Choose a project folder and read [project folder organisation](references/PROJECT-FOLDER-ORGANISATION.md). For a new project, create only the folders needed for the current work. For an existing project, record its folder paths in `project.json` and use those paths when a skill saves files. Keep the current option and stage in the manifest, a short account of each option in its `overview.md`, and dated decisions in `project-log.md`. The [workflow record](references/PROJECT-WORKFLOW.md) describes how `workflow.html` shows stage progress.

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231e3a42'/%3E%3Cpath d='M13 46 29 16l9 17 5-9 9 22' fill='none' stroke='%23c5d2a0' stroke-width='5'/%3E%3C/svg%3E">
+  <title>Project workflow · AIQ Studio</title>
+  <style>
+    :root{--ink:#1c3135;--muted:#617478;--line:#a9b6b2;--paper:#f4f6f2;--panel:#fff;--green:#35695e;--amber:#a77230;--blue:#365f83;--border:#d9e1dc}
+    html { scrollbar-gutter: stable; }
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans","Segoe UI",sans-serif}button{font:inherit}header{padding:28px clamp(18px,3vw,48px) 20px;border-bottom:1px solid var(--border);background:#fff}header .eyebrow,.eyebrow{font:600 11px "IBM Plex Mono",Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}h1{font-size:clamp(25px,2.4vw,38px);letter-spacing:-.035em;margin:7px 0 6px}header p{margin:0;color:var(--muted);max-width:72ch;font-size:14px}.shell{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;padding:18px;max-width:1900px;margin:auto}.map,.detail{background:var(--panel);border:1px solid var(--border);border-radius:14px}.map{align-self:start;min-width:0;overflow:hidden}.map-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border)}h2{font-size:15px;margin:0}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px}.legend span{display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.dot.done{background:var(--green)}.dot.active{background:var(--blue)}.dot.review{background:var(--amber)}.dot.empty{background:#aab7b3}.viewport{overflow:auto;padding:12px;min-height:610px}svg{display:block;min-width:1120px;width:100%;height:auto}.edge{fill:none;stroke:var(--line);stroke-width:2.5;marker-end:url(#arrow)}.node{cursor:pointer}.node rect{fill:#fff;stroke:#cad5cf;stroke-width:1.5;rx:10}.node:hover rect,.node:focus rect{stroke:var(--blue);stroke-width:2.5}.node.selected rect{stroke:var(--ink);stroke-width:3}.node text{font-size:16px;font-weight:600;fill:var(--ink);pointer-events:none}.node .sub{font-size:11px;font-weight:400;fill:var(--muted)}.node .status{stroke:none}.node[data-status="complete"] .status{fill:var(--green)}.node[data-status="in-progress"] .status{fill:var(--blue)}.node[data-status="review"] .status{fill:var(--amber)}.node[data-status="not-started"] .status{fill:#aab7b3}.context-label{font-size:12px;fill:#71817c}.detail{padding:24px;min-width:0;align-self:start;position:sticky;top:18px}.detail h2{font-size:25px;letter-spacing:-.025em;margin:10px 0}.badge{display:inline-block;padding:5px 9px;border-radius:5px;background:#edf2ef;color:var(--green);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}.detail p{font-size:14px;line-height:1.55;color:#42585b}.section{border-top:1px solid var(--border);padding-top:18px;margin-top:22px}.section h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.section ul{padding-left:18px;margin:0}.section li{font-size:13px;line-height:1.55;margin:7px 0;overflow-wrap:anywhere}.section a{color:var(--blue)}.empty-note{font-style:italic;color:var(--muted)!important}.footer{font-size:11px;color:var(--muted);padding:0 22px 18px}.note{padding:12px 22px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}@media(max-width:950px){.shell{grid-template-columns:1fr}.detail{position:static}.viewport{min-height:0}}
+      .node text { font-size: 19px; }
+    .node .sub { font-size: 14px; }
+    .context-label { font-size: 14px; }
+    header p, .detail p, .section li { font-size: 16px; }
+    .map-head h2 { font-size: 18px; }
+    .legend, .zoom-level, .note, .badge, .eyebrow, header .eyebrow { font-size: 13px; }
+    .map-controls button, .section h3 { font-size: 14px; }
+  </style>
+  <style>
+    /* Shared AIQ Urban and AIQ Resi UI tokens. */
+    :root{--ink:#333c55;--muted:#727889;--line:#b5bbca;--paper:#eef0f5;--panel:#f7f7f7;--green:#35695e;--amber:#a77230;--blue:#58629e;--border:#d4d9e4}
+    body{font-family:Avenir,Helvetica,Arial,sans-serif}header{background:var(--panel);border-color:#dce0e9}.eyebrow,header .eyebrow{font-family:Avenir,Helvetica,Arial,sans-serif;color:var(--blue)}.map,.detail{border-radius:13px;box-shadow:0 8px 28px #333c5510,0 1px 3px #333c5514}.map-head{flex-wrap:wrap}.legend{margin-left:auto}.viewport{height:min(70vh,760px);min-height:510px;overflow:hidden;padding:0;background-color:#f8f9fc;background-image:linear-gradient(#dce0e980 1px,transparent 1px),linear-gradient(90deg,#dce0e980 1px,transparent 1px);background-size:24px 24px;cursor:grab;touch-action:none}.viewport.dragging{cursor:grabbing}.viewport svg{width:100%;height:100%;min-width:0;touch-action:none}.node rect{fill:#fff;stroke:var(--border);rx:6}.node:hover rect,.node:focus rect{stroke:var(--blue)}.node:focus{outline:none}.node:focus rect{stroke:#58629e;stroke-width:3}.node.selected rect{stroke:var(--blue)}.node text{fill:var(--ink)}.edge{stroke:#63718b;stroke-width:1.8}.badge{border-radius:6px}.map-controls{display:flex;gap:5px;align-items:center;margin-left:10px}.map-controls button{height:31px;min-width:31px;padding:0 9px;background:#d1d6e3;border:1px solid #d4d9e4;border-radius:6px;color:#333c55;cursor:pointer;font-size:12px;font-weight:700}.map-controls button:hover{background:#e3e6ee}.map-controls button:focus-visible{outline:3px solid #a8b6ff;outline-offset:2px}.zoom-level{min-width:43px;text-align:center;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}.note{background:#f7f7f7}
+    .node.selected rect{fill:#333c55;stroke:#333c55}.node.selected text,.node.selected .sub{fill:#fff}.node.selected .status{stroke:white;stroke-width:1px;vector-effect:non-scaling-stroke}.viewport{height:auto;aspect-ratio:1250/286;min-height:0}
+    @media(max-width:950px){.viewport{height:auto;min-height:0}.legend{margin-left:0}.map-controls{margin-left:auto}}
+  </style>
+</head>
+<body>
+  <header><div class="eyebrow">AIQ Studio / Project record</div><h1 id="project-title">Site planning workflow</h1><p>Choose a step to see its purpose, current decision and files. The diagram shows the path from project inputs to detailed concept design.</p></header>
+  <main class="shell">
+    <section class="map" aria-label="Site planning flowchart"><div class="map-head"><h2>Design stages</h2><div class="legend"><span><i class="dot done"></i>Complete</span><span><i class="dot active"></i>In progress</span><span><i class="dot review"></i>Review</span><span><i class="dot empty"></i>Not started</span></div><div class="map-controls" aria-label="Canvas controls"><button type="button" id="zoom-out" aria-label="Zoom out">−</button><span class="zoom-level" id="zoom-level">100%</span><button type="button" id="zoom-in" aria-label="Zoom in">+</button><button type="button" id="zoom-fit">Fit</button></div></div>
+      <div class="viewport" id="viewport"><svg id="workflow-svg" viewBox="0 0 1250 286" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Site data, programme brief and project goals feed site analysis, then concept stages">
+        <defs><marker id="arrow" viewBox="0 0 8 8" refX="8" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#63718b"/></marker></defs>
+        <path class="edge" d="M221 45 H243 Q251 45 251 53 V105 Q251 113 259 113 H280"/>
+        <path class="edge" d="M221 127 H280"/>
+        <path class="edge" d="M221 209 H243 Q251 209 251 201 V149 Q251 141 259 141 H280"/>
+        <path class="edge" d="M466 113 H485 Q493 113 493 105 V53 Q493 45 501 45 H528"/>
+        <path class="edge" d="M466 127 H528"/>
+        <path class="edge" d="M466 141 H485 Q493 141 493 149 V201 Q493 209 501 209 H528"/>
+        <path class="edge" d="M374 154 V240 Q374 248 382 248 H885 Q893 248 893 240 V238"/>
+        <path class="edge" d="M633 154 V180"/>
+        <path class="edge" d="M737 209 H798"/>
+        <path class="edge" d="M987 209 H1048"/>
+        <g id="nodes"></g>
+        <text x="26" y="271" class="context-label">Project folder structure holds the records · People can revise any step at any time</text>
+      </svg></div><div class="note">Drag the blank canvas to pan. Use the wheel or the controls to zoom. Arrows show information flow; later work can change an earlier decision.</div>
+    </section>
+    <aside class="detail" aria-live="polite"><div class="eyebrow" id="detail-type">Select a stage</div><h2 id="detail-title">Project overview</h2><span class="badge" id="detail-status">Not started</span><p id="detail-description">Select a box in the diagram to see its record.</p><div class="section"><h3>Current summary</h3><p id="detail-summary" class="empty-note">No summary recorded.</p></div><div class="section"><h3>Decisions</h3><div id="detail-decisions" class="empty-note">No decisions recorded.</div></div><div class="section"><h3>Files</h3><div id="detail-files" class="empty-note">No files recorded.</div></div></aside>
+  </main>
+  <script>const DATA = JSON.parse(atob("__PROJECT_DATA_BASE64__"));
+    const layout=[
+      {id:'site-data',label:'Site data',x:26,y:18,w:195,h:54,type:'Input'},
+      {id:'programme-brief',label:'Programme brief',x:26,y:100,w:195,h:54,type:'Input'},
+      {id:'project-goals',label:'Project goals',x:26,y:182,w:195,h:54,type:'Input'},
+      {id:'site-analysis',label:'Site analysis',x:282,y:100,w:184,h:54,type:'Analysis'},
+      {id:'parti-diagramming',label:'Parti diagramming',x:530,y:18,w:207,h:54,type:'Design'},
+      {id:'pre-concept',label:'Pre-concept',x:530,y:100,w:207,h:54,type:'Design'},
+      {id:'conceptual-programme-brief',label:'Conceptual programme brief',x:530,y:182,w:207,h:54,type:'Brief'},
+      {id:'concept-design',label:'Concept design',x:800,y:182,w:187,h:54,type:'Design'},
+      {id:'detailed-concept-design',label:'Detailed concept design',x:1050,y:182,w:178,h:54,type:'Design'}
+    ];
+    const descriptions={
+      'site-data':'The supplied evidence about the site, including boundaries, surveys and existing conditions.',
+      'programme-brief':'The requested uses, areas and capacities. Project goals and planning rules have separate records.',
+      'project-goals':'The project outcomes and priorities that guide design choices.',
+      'site-analysis':'An interpretation of the site evidence against the brief and project goals.',
+      'parti-diagramming':'A simple diagram that explains the driving spatial or cultural idea.',
+      'pre-concept':'Early options that test broad spatial relationships and design direction.',
+      'conceptual-programme-brief':'A first distribution of the programme across the site or design option.',
+      'concept-design':'A developed concept with approximate zones, movement and form.',
+      'detailed-concept-design':'A more precise concept that tests areas, geometry and model implications.'
+    };
+    const ns='http://www.w3.org/2000/svg', root=document.getElementById('nodes');
+    document.getElementById('project-title').textContent=DATA.name||'Site planning workflow';
+    function el(name,attrs){const n=document.createElementNS(ns,name);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);return n}
+    function list(target,items,files){target.replaceChildren();if(!Array.isArray(items)||!items.length){target.className='empty-note';target.textContent=files?'No files recorded.':'No decisions recorded.';return}target.className='';const ul=document.createElement('ul');for(const item of items){const li=document.createElement('li');if(files){const a=document.createElement('a');a.href=item.path.split('/').map(encodeURIComponent).join('/');a.textContent=item.label||item.path;li.append(a)}else li.textContent=item;ul.append(li)}target.append(ul)}
+    function show(item){const record=DATA.workflow?.nodes?.[item.id]||{};document.querySelectorAll('.node').forEach(n=>n.classList.toggle('selected',n.dataset.id===item.id));document.getElementById('detail-type').textContent=item.type;document.getElementById('detail-title').textContent=item.label;document.getElementById('detail-status').textContent=(record.status||'not-started').replaceAll('-',' ');document.getElementById('detail-description').textContent=descriptions[item.id];const summary=document.getElementById('detail-summary');summary.textContent=record.summary||'No summary recorded.';summary.className=record.summary?'':'empty-note';list(document.getElementById('detail-decisions'),record.decisions,false);list(document.getElementById('detail-files'),record.files,true)}
+    for(const item of layout){const r=DATA.workflow?.nodes?.[item.id]||{},g=el('g',{class:'node','data-id':item.id,'data-status':r.status||'not-started',tabindex:'0',role:'button','aria-label':item.label+', '+(r.status||'not started')});g.append(el('rect',{x:item.x,y:item.y,width:item.w,height:item.h}));g.append(el('circle',{class:'status',cx:item.x+18,cy:item.y+23,r:5}));const t=el('text',{x:item.x+31,y:item.y+27});if(item.label==='Conceptual programme brief'||item.label==='Detailed concept design'){const words=item.label.split(' '),breakAt=1;t.textContent=words.slice(0,breakAt).join(' ');const t2=el('text',{x:item.x+31,y:item.y+45,class:'sub'});t2.textContent=words.slice(breakAt).join(' ');g.append(t,t2)}else{t.textContent=item.label;g.append(t)}g.addEventListener('click',()=>show(item));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(item)}});root.append(g)}show(layout[3]);
+    const svg=document.getElementById('workflow-svg'),viewport=document.getElementById('viewport'),base={x:0,y:0,w:1250,h:286};let view={...base},drag=null;
+    function setView(){svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`);document.getElementById('zoom-level').textContent=Math.round(base.w/view.w*100)+'%'}
+    function zoom(factor,clientX,clientY){const point=svg.createSVGPoint();point.x=clientX;point.y=clientY;const world=point.matrixTransform(svg.getScreenCTM().inverse()),px=(world.x-view.x)/view.w,py=(world.y-view.y)/view.h,ratio=Math.max(.35,Math.min(4,base.w/view.w*factor)),w=base.w/ratio,h=base.h/ratio;view={x:world.x-px*w,y:world.y-py*h,w,h};setView()}
+    svg.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY)},{passive:false});
+    viewport.addEventListener('pointerdown',e=>{if(e.target.closest('.node'))return;const matrix=svg.getScreenCTM();drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y,sx:matrix.a,sy:matrix.d};viewport.setPointerCapture(e.pointerId);viewport.classList.add('dragging')});
+    viewport.addEventListener('pointermove',e=>{if(!drag)return;view.x=drag.vx-(e.clientX-drag.x)/drag.sx;view.y=drag.vy-(e.clientY-drag.y)/drag.sy;setView()});
+    function stopDrag(){drag=null;viewport.classList.remove('dragging')}viewport.addEventListener('pointerup',stopDrag);viewport.addEventListener('pointercancel',stopDrag);
+    document.getElementById('zoom-in').addEventListener('click',()=>{const r=svg.getBoundingClientRect();zoom(1.2,r.left+r.width/2,r.top+r.height/2)});
+    document.getElementById('zoom-out').addEventListener('click',()=>{const r=svg.getBoundingClientRect();zoom(1/1.2,r.left+r.width/2,r.top+r.height/2)});
+    document.getElementById('zoom-fit').addEventListener('click',()=>{view={...base};setView()});setView();
+  </script>
+</body>
+</html>

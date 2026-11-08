@@ -1,0 +1,38 @@
+{
+  "name": "Example site planning project",
+  "example": true,
+  "folders": {
+    "siteSources": "03_Site_Research/source",
+    "siteReports": "03_Site_Research/reports",
+    "programme": "01_Admin/programme",
+    "projectGoals": "01_Admin/brief"
+  },
+  "workflow": {
+    "nodes": {
+      "site-data": {
+        "status": "complete",
+        "summary": "A fictional site boundary and basic conditions have been recorded for this example.",
+        "decisions": ["Use the fictional site note as the starting evidence."],
+        "files": [{"label": "Site data note", "path": "03_Site_Research/source/site-data.md"}]
+      },
+      "programme-brief": {
+        "status": "in-progress",
+        "summary": "Example uses and capacities are listed. Areas still need to be set.",
+        "decisions": ["Record uses and capacities before testing areas."],
+        "files": [{"label": "Programme note", "path": "01_Admin/programme/programme-brief.md"}]
+      },
+      "project-goals": {
+        "status": "complete",
+        "summary": "The example project goals are recorded separately from the programme.",
+        "decisions": [],
+        "files": [{"label": "Project goals", "path": "01_Admin/brief/project-goals.md"}]
+      },
+      "site-analysis": {
+        "status": "review",
+        "summary": "An initial finding is recorded for review. It has not set a design direction yet.",
+        "decisions": [],
+        "files": [{"label": "Site analysis note", "path": "03_Site_Research/reports/site-analysis.md"}]
+      }
+    }
+  }
+}
