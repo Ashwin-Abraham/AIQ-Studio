@@ -7,7 +7,6 @@ An AEC workflow takes a project from stated needs and site evidence through desi
 | Skill | What it produces | How it fits |
 | --- | --- | --- |
 | [Project Setup](skills/project-setup/SKILL.md) | A project folder map, `project.json`, and a local workflow view. | Starts a project or records an existing layout. |
-| [Project Orchestrator](skills/project-orchestrator/SKILL.md) | Current stage summaries, decisions and file links in the manifest and HTML view. | Keeps the project record aligned with work. |
 | [Programme Brief](skills/programme-brief/SKILL.md) | A spreadsheet of uses, areas and capacities, with assumptions and sources. | Gives site and design work a measurable demand. |
 | [Rhino Site Data Model](skills/rhino-site-data-model/SKILL.md) | A checked Rhino site model, source data and validation report. | Gives design and analysis a shared site base. |
 | [Concept Planning](skills/concept-planning/SKILL.md) | A driving vision, parti, rough spatial plan, and refined zoning or massing approach. | Develops design options from the programme and site findings. |

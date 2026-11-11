@@ -1,0 +1,80 @@
+:root {
+  --ink: #333c55;
+  --muted: #727889;
+  --paper: #eef0f5;
+  --panel: #f7f7f7;
+  --green: #35695e;
+  --amber: #a77230;
+  --blue: #58629e;
+  --border: #d4d9e4;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scrollbar-gutter: stable;
+}
+body {
+  margin: 0;
+}
+button {
+  font: inherit;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  box-shadow:
+    0 8px 28px #333c5510,
+    0 1px 3px #333c5514;
+  align-self: start;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.workspace-panel {
+  min-width: 0;
+  min-height: 152px;
+}
+.workspace-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 59px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.workspace-panel-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.workspace-panel-body {
+  padding: 16px 18px;
+}
+.workspace-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+[data-status="complete"] {
+  --status-color: var(--green);
+}
+[data-status="in-progress"] {
+  --status-color: var(--blue);
+}
+[data-status="review"] {
+  --status-color: var(--amber);
+}
+[data-status="not-started"] {
+  --status-color: #aab7b3;
+}

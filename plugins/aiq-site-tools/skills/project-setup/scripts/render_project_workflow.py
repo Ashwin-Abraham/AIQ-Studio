@@ -1,7 +1,6 @@
 """Render the standalone workflow view from a project manifest."""
 
 import argparse
-import base64
 import json
 from pathlib import Path
 
@@ -41,9 +40,12 @@ def render(project_root: Path) -> Path:
                     or "\\" in item["path"] or ":" in item["path"]):
                 raise ValueError(f"File path must stay inside the project: {path}")
 
-    source = Path(__file__).resolve().parents[1] / "assets" / "project-workflow.html"
-    encoded = base64.b64encode(json.dumps(data, ensure_ascii=True).encode("ascii")).decode("ascii")
-    html = source.read_text(encoding="utf-8").replace("__PROJECT_DATA_BASE64__", encoded)
+    source = Path(__file__).resolve().parents[3] / "assets" / "project-workflow.generated.html"
+    if not source.exists():
+        raise FileNotFoundError("Build src/tools/project-orchestrator with npm run build first.")
+    encoded = json.dumps(data, ensure_ascii=True).replace("<", "\\u003c")
+    payload = f'<script type="application/json" id="project-data">{encoded}</script>'
+    html = source.read_text(encoding="utf-8").replace("<!-- PROJECT_DATA -->", payload)
     output = project_root / "workflow.html"
     output.write_text(html, encoding="utf-8")
     return output
