@@ -1,6 +1,6 @@
 # Project workflow record
 
-Keep `project.json` and the generated `workflow.html` together at the project root. The JSON is the editable record. The HTML is a read-only view. Run `python <plugin>/scripts/render_project_workflow.py <project-root>` after each manifest update. The page embeds the current record so it works when opened as a local file.
+Keep `project.json` and the generated `workflow.html` together at the project root. The JSON is the editable record. The HTML is a read-only view. Run `python <plugin>/skills/project-setup/scripts/render_project_workflow.py <project-root>` after each manifest update. The page embeds the current record so it works when opened as a local file.
 
 ## Manifest fields
 
